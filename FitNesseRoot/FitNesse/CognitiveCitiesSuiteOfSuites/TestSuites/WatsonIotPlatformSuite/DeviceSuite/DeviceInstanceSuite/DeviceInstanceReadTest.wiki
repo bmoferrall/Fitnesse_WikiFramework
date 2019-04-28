@@ -1,0 +1,11 @@
+---
+Help: Get information about different device instances
+---
+<test page>
+!define TEST_SYSTEM {slim}
+!path   ./CognitiveCitiesTesting.jar
+
+|read service  |
+|serviceName|customHeaders|expectedCode|searchFor|expectedCount|
+|/device/types/CapAlertSender_V4/devices/capAlertSender_V4||200|=~/"deviceId":"capAlertSender_V4"/|1|
+|/device/types/CapAlertSender_V4/devices/Seat1_RowH_SectionB_MiamiStadium||200|=~/"deviceId":"Seat1_RowH_SectionB_MiamiStadium"/|1|

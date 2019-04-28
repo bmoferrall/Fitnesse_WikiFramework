@@ -1,0 +1,19 @@
+---
+Help: Clean up after SOP tests
+Test
+---
+<test page>
+
+!define TEST_SYSTEM {slim}
+!path   ./CognitiveCitiesTesting.jar
+
+'''Include SOP Datasource Clean Up'''
+
+!include <IocSuite.IocHelperSuite.SopDatasourceTearDown
+
+'''Include SOP Definition Clean Up'''
+
+!include <IocSuite.IocHelperSuite.SopDefinitionTearDown
+
+
+!include <IocServicesSuite.SuiteTearDown

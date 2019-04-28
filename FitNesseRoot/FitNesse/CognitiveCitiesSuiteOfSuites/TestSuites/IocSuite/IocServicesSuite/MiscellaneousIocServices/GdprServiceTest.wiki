@@ -1,0 +1,12 @@
+<test page>
+!define TEST_SYSTEM {slim}
+!path   ./CognitiveCitiesTesting.jar
+
+
+'''Test the GDPR service'''
+
+|script                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+|#''Read all apps''|
+|read service ;  |/gdpr-service/apps/     ||200 |=~/"appId": ?"IOC"/                                                                                                                                                                                                                                  |>=1                                                                                                                                                                                                                          |
+|#''Read IOC apps''|
+|read service ;  |/gdpr-service/apps/IOC     ||200 |=~/"name": ?"IBM Intelligent Operations Center"/                                                                                                                                                                                                                                  |1                                                                                                                                                                                                                          |

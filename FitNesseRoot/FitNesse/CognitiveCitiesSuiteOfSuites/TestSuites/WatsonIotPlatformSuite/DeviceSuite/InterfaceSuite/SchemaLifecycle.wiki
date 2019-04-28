@@ -1,0 +1,12 @@
+---
+Help: Create and Delete Schemas for Events and Logical Interfaces
+Test
+---
+<test page>
+!define TEST_SYSTEM {slim}
+!path   ./CognitiveCitiesTesting.jar
+
+|script                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+|create multipart service;|/draft/schemas       | schemaFile|./testfiles/testSchema_LI.json|name:testSchema_LI      |201|
+|read service;|/draft/schemas       | |200|=~/"id":"[a-z0-9]+"/|>0|
+|delete service ;|/draft/schemas/$RID       | |204||

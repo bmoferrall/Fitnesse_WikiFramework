@@ -1,0 +1,19 @@
+---
+Help: Set Up Page for Watson Suite
+Suite
+---
+<test page>
+
+!define TEST_SYSTEM {slim}
+
+|Import                       |
+|com.ibm.cognitivecities.fitnesse.fixtures.rest    |
+|com.ibm.cognitivecities.fitnesse.fixtures.database|
+
+!|ApplicationSetUp                              |
+|protocol|host                         |port|urlbase|user    |password|
+|https|9kpzic.internetofthings.ibmcloud.com|443|/api/v0002|a-9kpzic-cfbqvnuh2h|T-LN4Nd8onlBKol8s_|
+
+!|DatabaseSetUp                                                                                               |
+|connectionName|databaseName|host                        |port |user    |password|connectionURL?|connectionOK?|
+|bludb           |bludb       |dashdb-entry-yp-dal09-09.services.dal.bluemix.net|50000|dash10952|3q1Qu_qiFBL_|              |true         |

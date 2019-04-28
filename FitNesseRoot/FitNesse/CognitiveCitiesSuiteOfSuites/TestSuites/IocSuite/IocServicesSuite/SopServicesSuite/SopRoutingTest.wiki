@@ -1,0 +1,44 @@
+<test page>
+
+!define TEST_SYSTEM {slim}
+!path   ./CognitiveCitiesTesting.jar
+'''Include Variables Definitions'''
+
+!include <IocServicesSuite.SetUpVariables
+'''Copy CSV with update to record number 1. Note that the ID column is a 'used as id' column in this datasource'''
+
+| script |
+| remote file copy; | ./testfiles/sop_delta.csv | /opt/IBM/ioc/csv/soptest.csv | ${APPSERVER} | ${APPSERVERUSER} | ${APPSERVERKEYFILE} | ${APPSERVERKEYPWD} |
+
+| script |
+| #''Wait at least 1 minute for IOC to ingest the new file (polling time is 1 minute)'' |
+| time delay ; | 115000 |
+
+| generic service validator fixture |
+| # comment | requestType | serviceName | requestBody | customHeaders | getResponseCode? | getResponseMessage? | getResponseId? | getResultCount? | getUrl? |
+| Verify we have the new item | GET | /spatial-service/features/$DSID_SOP | | | 200 | =~/(?i)"Name":"NAME3"/ | | 1 | |
+
+'''Verify the target table has three records'''
+
+| generic database fixture |
+| # comment | connectionName | statementType | statementText | responseFormat | getResponse? | getResultCount? | getResponseMessage? |
+| Verify the target table still has three records | iocdata | read | select count as count from ioc.target_table_sop_test | json | [{"COUNT":3}] | 1 | OK |
+
+'''Verify the item was routed to SOP'''
+
+!| ModelSetUp |
+| idName |
+| uid |
+
+| generic service validator fixture |
+| # comment | requestType | serviceName | requestBody | customHeaders | getResponseCode? | getResponseMessage? | getResponseId? |getResponseMap?| getResultCount? | getUrl? |
+| Verify we have a new SOP instance | GET | /sop-service/sopDefinition/$SOPDEFID/instance/?includeDetail=true | | | 200 | =~/(?i)"name":"SOP definition sample name 1 \(NAME3\)"/ | $SOPID= || 1 | |
+| Retrieve the instance | GET | /sop-service/sop/$SOPID | | | 200 | =~/(?i)"name":"SOP definition sample name 1 \(NAME3\)"/ | || 1 | |
+| Retrieve the activity | GET | /sop-service/sop/$SOPID/activity/ | | | 200 | =~/(?i)"description":"SOP activity definition sample description 1"/ | || 1 | |
+| Retrieve the event | GET | /sop-service/sop/$SOPID/event/ | | | 200 | =~/(?i)"objectId"/ | |$EMAP=| 1 | |
+| Retrieve datasource item | GET | /spatial-service/collections/$`EMAP.dataSourceId`/records/$`EMAP.objectId`|| | 200 | =~/"fullProperties"/|||1||
+| Delete the SOP Instance | DELETE | /sop-service/sop/$SOPID | | | 204 | || |||
+
+'''Restore defaults'''
+
+!| ModelTearDown |

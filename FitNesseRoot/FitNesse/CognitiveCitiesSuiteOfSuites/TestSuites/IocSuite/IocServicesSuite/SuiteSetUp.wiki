@@ -1,0 +1,19 @@
+---
+Test
+---
+<test page>
+
+!define TEST_SYSTEM {slim}
+
+|Import                       |
+|com.ibm.cognitivecities.fitnesse.fixtures.rest    |
+|com.ibm.cognitivecities.fitnesse.fixtures.database|
+
+!|ApplicationSetUp                              |
+|protocol|host                         |port|urlbase|user    |password|
+|https|dubperfwow2-web.mul.ie.ibm.com|443|/ibm/ioc/api|sysadmin|us3rpa88|
+
+!|DatabaseSetUp                                                                                               |
+|connectionName|databaseName|host                        |port |user    |password|connectionURL?|connectionOK?|
+|iocdb          |iocdb       |dubperfwow2-db.mul.ie.ibm.com|50000|db2i1own|us3rpa88|              |true         |
+|iocdata        |iocdata       |dubperfwow2-db.mul.ie.ibm.com|50000|db2i1own|us3rpa88|              |true         |

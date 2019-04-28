@@ -1,0 +1,21 @@
+---
+Help: Test life cycle of a device type
+---
+<test page>
+!define TEST_SYSTEM {slim}
+!path   ./CognitiveCitiesTesting.jar
+
+|script                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+|create service;|/device/types       | {"id": "MyTestDeviceType","description": "My Test Device Description"}       ||201|
+|read service;  |/device/types/MyTestDeviceType    ||200 |=~/"id":"MyTestDeviceType"/                                                                                                                                                                                                                                  |1                                                                                                                                                                                                                          |
+|update service;|/device/types/MyTestDeviceType       |{ "deviceInfo": { "manufacturer": "Bosch" } } | |200|
+|read service;  |/device/types/MyTestDeviceType     | |200|=~/"manufacturer":"Bosch"/                                                                                                                                                                                                                                  |1                                                                                                                                                                                                                          |
+|delete service;|/device/types/MyTestDeviceType| |204||
+
+|generic service validator fixture                                                                                                                                                  |
+|requestType|serviceName                                                                                               |requestBody|customHeaders|getResponseCode?|getResponseMessage?|getResultCount?|getUrl?|
+|POST        |/device/types                        |{"id": "MyTestDeviceType","description": "My Test Device Description"}||201             |=~/"id":"MyTestDeviceType"/||       |
+|GET        |/device/types/MyTestDeviceType |||200             |=~/"id":"MyTestDeviceType"/|1|       |
+|PUT        |/device/types/MyTestDeviceType |{ "deviceInfo": { "manufacturer": "Bosch" } }||200             |=~/"manufacturer":"Bosch"/||       |
+|GET        |/device/types/MyTestDeviceType |||200             |=~/"manufacturer":"Bosch"/|1|       |
+|DELETE     |/device/types/MyTestDeviceType |||204             |||       |

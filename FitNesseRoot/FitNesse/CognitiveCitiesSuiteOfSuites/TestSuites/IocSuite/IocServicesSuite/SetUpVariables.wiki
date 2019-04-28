@@ -1,0 +1,38 @@
+---
+Test
+---
+<test page>
+
+!define TEST_SYSTEM {slim}
+
+!define APPSERVER {dubperfwow2-app.mul.ie.ibm.com}
+!define APPSERVERUSER {root}
+!define APPSERVERKEYFILE {./testfiles/fitnesse_keyfile.ppk}
+!define APPSERVERKEYPWD {}
+!define DS_NAME_RR_AREAS {RR_Areas_Fitnesse}
+!define CSV_NAME_RR_AREAS {RR_Areas_Fitnesse.csv}
+!define TT_NAME_RR_AREAS {RR_AREAS_FITNESSE}
+!define DS_NAME_RR_LPERMITS {RR_Liquour_Permits_Fitnesse}
+!define CSV_NAME_RR_LPERMITS {RR_Liquour_Permits_Fitnesse.csv}
+!define TT_NAME_RR_LPERMITS {RR_LIQUOUR_PERMITS_FITNESSE}
+!define DS_NAME_RR_311 {RR_311_Calls_Fitnesse}
+!define CSV_NAME_RR_311 {RR_311_Calls_Fitnesse.csv}
+!define TT_NAME_RR_311 {RR_311_CALLS_FITNESSE}
+!define DS_NAME_RR_911 {RR_911_Calls_Fitnesse}
+!define CSV_NAME_RR_911 {RR_911_Calls_Fitnesse.csv}
+!define TT_NAME_RR_911 {RR_911_CALLS_FITNESSE}
+!define DS_NAME_RR_BUS_STOPS {RR_Bus_Stops_Fitnesse}
+!define CSV_NAME_RR_BUS_STOPS {RR_Bus_Stops_Fitnesse.csv}
+!define TT_NAME_RR_BUS_STOPS {RR_BUS_STOPS_FITNESSE}
+!define DS_NAME_RR_BUSINESS_LICENSES {RR_Business_Licenses_Fitnesse}
+!define CSV_NAME_RR_BUSINESS_LICENSES {RR_Business_Licenses_Fitnesse.csv}
+!define TT_NAME_RR_BUSINESS_LICENSES {RR_BUSINESS_LICENSES_FITNESSE}
+!define DS_NAME_RR_LSELLERS {RR_Liquour_Sellers_Fitnesse}
+!define CSV_NAME_RR_LSELLERS {RR_Liquour_Sellers_Fitnesse.csv}
+!define TT_NAME_RR_LSELLERS {RR_LIQUOUR_SELLERS_FITNESSE}
+!define DS_NAME_RR_POLICE_INCIDENTS {RR_Police_Incidents_Fitnesse}
+!define CSV_NAME_RR_POLICE_INCIDENTS {RR_Police_Incidents_Fitnesse.csv}
+!define TT_NAME_RR_POLICE_INCIDENTS {RR_POLICE_INCIDENTS_FITNESSE}
+!define DS_NAME_RR_TLPERMITS {RR_Temp_Liquour_Permits_Fitnesse}
+!define CSV_NAME_RR_TLPERMITS {RR_Temp_Liquour_Permits_Fitnesse.csv}
+!define TT_NAME_RR_TLPERMITS {RR_TEMP_LIQUOUR_PERMITS_FITNESSE}

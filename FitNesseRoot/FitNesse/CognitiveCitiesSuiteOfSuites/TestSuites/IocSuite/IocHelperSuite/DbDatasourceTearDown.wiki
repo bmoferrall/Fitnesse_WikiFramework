@@ -1,0 +1,22 @@
+---
+Test
+---
+<test page>
+
+!define TEST_SYSTEM {slim}
+!path   ./CognitiveCitiesTesting.jar
+
+'''CLEAN UP DATABASE DATASOURCES'''
+
+| generic service validator fixture |
+| # comment | requestType | serviceName | requestBody | customHeaders | getResponseCode? | getResponseMessage? | getResponseId? | getResultCount? | getUrl? |
+| Delete the data source | DELETE | /datasource-service/datasources/$DSID_DB | | | 204 | ||  | |
+
+'''Drop database table used for sample data sources'''
+
+| generic database fixture |
+| # comment | connectionName | statementType | statementText | responseFormat | getResponse? | getResultCount? | getResponseMessage? |
+| Delete source database table | iocdb | delete | drop table ioc.ds_source_table | |  | | OK |
+
+
+

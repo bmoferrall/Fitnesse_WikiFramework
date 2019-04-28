@@ -1,0 +1,26 @@
+<test page>
+!define TEST_SYSTEM {slim}
+!path   ./CognitiveCitiesTesting.jar
+
+'''Include Variables Definitions'''
+
+!include <IocServicesSuite.SetUpVariables
+
+'''Add a new item using the data injection service'''
+
+|generic service validator fixture                                                                                                                                                  |
+|# comment|requestType|serviceName                                                                                               |requestBody|customHeaders|getResponseCode?|getResponseMessage?|getResponseId?|getResultCount?|getUrl?|
+|Add item|POST        |/data-injection-service/datablocks/$DSID_CSV/dataitems     | {"Property_ID":3,"Name":"NAME3","StartDateTime":"2019-04-04T11:00:00-00:00","EndDateTime":"","Location":"POINT (-97.72190603 30.56611663)","DELETEFLAG":false }       ||200||$ITEMID=|||
+|Verify item was added|GET        |/spatial-service/features/$DSID_CSV?criterion=Property_ID%3D3 |||200             |=~/(?i)"Name":"NAME3"/||1||
+|Update item|PUT        |/data-injection-service/datablocks/$DSID_CSV/dataitems/$ITEMID     | {"Property_ID":3,"Name":"NAME3 (Updated)","StartDateTime":"2019-04-04T11:00:00-00:00","EndDateTime":"","Location":"POINT (-97.72190603  30.56611663)","DELETEFLAG":false}       ||200|||||
+|Verify item was updated|GET        |/spatial-service/features/$DSID_CSV?criterion=Property_ID%3D3 |||200             |=~/(?i)"Name":"NAME3 \(Updated\)"/||1||
+|Verify  using valid start date filter|GET        |/spatial-service/features/$DSID_CSV?criterion=Property_ID%3D3&criterion=startDateTime%3E%3D2019-04-04T10%3A00%3A00-00%3A00 |||200             |=~/(?i)"Name":"NAME3 \(Updated\)"/||1||
+|Test with out-of-range start date filter|GET        |/spatial-service/features/$DSID_CSV?criterion=Property_ID%3D3&criterion=startDateTime%3C%3D2019-03-30T00%3A00%3A00-00%3A00 |||200             |=~/(?i)"features":\[\]/||1||
+|Delete item|DELETE     |/data-injection-service/datablocks/$DSID_CSV/dataitems/$ITEMID|||204             ||||       |
+|Verify item was deleted|GET        |/spatial-service/features/$DSID_CSV?criterion=Property_ID%3D3 |||200             |=~/(?i)"deleted":true/||1||
+
+'''Verify the target table has three records'''
+
+|generic database fixture                                                                                                                                                                                                        |
+|# comment|connectionName|statementType|statementText                                                                                                       |responseFormat|getResponse?               |getResultCount?|getResponseMessage?|
+|Verify the target table has three records|iocdata           |read         |select count as count from ioc.target_table_csv_test      |json          |[{"COUNT":3}]              |1              |OK                 |

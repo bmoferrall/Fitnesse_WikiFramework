@@ -1,0 +1,39 @@
+---
+Test
+---
+<test page>
+
+!define TEST_SYSTEM {slim}
+!path   ./CognitiveCitiesTesting.jar
+
+'''Include Variable Definitions'''
+
+!include <IocSuite.IocServicesSuite.SetUpVariables
+
+
+'''CREATE SOP DEFINITION'''
+
+!|ModelSetUp                |
+|idName|
+|uid|
+
+|generic service validator fixture                                                                                                                                                  |
+|# comment|requestType|serviceName                                                                                               |requestBody|customHeaders|getResponseCode?|getResponseMessage?|getResponseId?|getResultCount?|getUrl?|
+|Create new dummy SOP definition|POST        |/sop-service/sopDefinition     | {"uid":0,"name":"UNKNOWN","description":"UNKNOWN"}       ||200||$SOPDEFID=|||
+|Complete creation with correct body|POST        |/sop-service/sopDefinition/$SOPDEFID     | {"uid":"$SOPDEFID","name":"SOP definition sample name 1","description":"SOP definition sample description 1","transitional":false,"roleAccess":[{"roleName":"SystemAdmins","accessType":2}]}       ||200|||||
+|Create activity definition|POST        |/sop-service/sopDefinition/$SOPDEFID/activityDefinition     | {"name":"SOP activity definition sample 1","required":false,"durationUnit":"2","description":"SOP activity definition sample description 1","reference":[ ],"autostart":true,"estDuration":10,"actOrder":1,"roleAccess":[{ "roleName":"SystemAdmins","accessType":2} ],"activityType":null}       ||200|||||
+|Submit for approval|POST        |/sop-service/sopDefinition/$SOPDEFID/submitForApproval     |        ||200|||||
+|Approve|POST        |/sop-service/sopDefinition/$SOPDEFID/approve     |        ||200|||||
+|Verify|GET        |/sop-service/sopDefinition/$SOPDEFID |||200             |=~/"description":"SOP definition sample description 1"/||1||
+
+!|ModelSetUp                |
+|idName|
+|versionUid|
+
+|generic service validator fixture                                                                                                                                                  |
+|# comment|requestType|serviceName                                                                                               |requestBody|customHeaders|getResponseCode?|getResponseMessage?|getResponseId?|getResultCount?|getUrl?|
+|Get version id|GET        |/sop-service/sopDefinition/$SOPDEFID/versions |||200             |=~/"description":"SOP definition sample description 1"/|$SOPDEFVID=|1||
+
+'''Restore defaults'''
+
+!|ModelTearDown                |

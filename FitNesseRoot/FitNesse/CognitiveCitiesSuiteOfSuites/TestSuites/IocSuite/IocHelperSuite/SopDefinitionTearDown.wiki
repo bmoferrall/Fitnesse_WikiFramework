@@ -1,0 +1,14 @@
+---
+Test
+---
+<test page>
+
+!define TEST_SYSTEM {slim}
+!path   ./CognitiveCitiesTesting.jar
+
+'''Delete SOP Definition created in Suite Set Up'''
+
+|script                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+|#''Delete SOP definition''|
+|delete service;|/sop-service/sopDefinition/$SOPDEFID ||204||
+

@@ -1,0 +1,5 @@
+---
+Help: Suite of tests for devices
+---
+!1 Device Instance Suite
+!contents -R2 -g -p -f -h

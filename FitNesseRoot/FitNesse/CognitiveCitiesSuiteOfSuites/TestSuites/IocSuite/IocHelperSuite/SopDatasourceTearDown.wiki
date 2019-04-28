@@ -1,0 +1,15 @@
+---
+Test
+---
+<test page>
+
+!define TEST_SYSTEM {slim}
+!path   ./CognitiveCitiesTesting.jar
+
+'''CLEAN UP CSV DATASOURCE USED FOR SOP TESTING'''
+
+'''Delete the CSV type data source'''
+
+|generic service validator fixture                                                                                                                                                  |
+|# comment |requestType|serviceName                                                                                               |requestBody|customHeaders|getResponseCode?|getResponseMessage?|getResponseId?|getResultCount?|getUrl?|
+|Delete the data source|DELETE     |/datasource-service/datasources/$DSID_SOP|||204             ||||       |

@@ -1,0 +1,25 @@
+---
+Help: Create, Read, Update, Read, Delete Test Device
+---
+<test page>
+!define TEST_SYSTEM {slim}
+!path   ./CognitiveCitiesTesting.jar
+
+|script                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+|create service;|/device/types       | {"id": "MyTestDeviceType","description": "My Test Device Description"}       ||201|
+|create service;|/device/types/MyTestDeviceType/devices       | { "deviceId": "MyTestDevice1", "authToken": "Pa88w0rd" }       ||201|
+|read service;  |/device/types/MyTestDeviceType/devices     ||200 |=~/"deviceId":"MyTestDevice1"/                                                                                                                                                                                                                                  |1                                                                                                                                                                                                                          |
+|update service;|/device/types/MyTestDeviceType/devices/MyTestDevice1       |{ "deviceInfo": { "serialNumber": "12345" } } | |200|
+|read service;  |/device/types/MyTestDeviceType/devices      ||200|=~/"serialNumber":"12345"/                                                                                                                                                                                                                                  |1                                                                                                                                                                                                                          |
+|delete service;|/device/types/MyTestDeviceType/devices/MyTestDevice1 ||204||
+|delete service;|/device/types/MyTestDeviceType ||204||
+
+|generic service validator fixture                                                                                                                                                  |
+|requestType|serviceName                                                                                               |requestBody|customHeaders|getResponseCode?|getResponseMessage?|getResultCount?|getUrl?|
+|POST        |/device/types                        |{"id": "MyTestDeviceType","description": "My Test Device Description"}||201             |=~/"id":"MyTestDeviceType"/||       |
+|POST        |/device/types/MyTestDeviceType/devices                        |{ "deviceId": "MyTestDevice1", "authToken": "Pa88w0rd" }||201             |=~/"deviceId":"MyTestDevice1"/||       |
+|GET        |/device/types/MyTestDeviceType/devices |||200             |=~/"deviceId":"MyTestDevice1"/|1|       |
+|PUT        |/device/types/MyTestDeviceType/devices/MyTestDevice1 |{ "deviceInfo": { "serialNumber": "12345" } }||200             |=~/"serialNumber":"12345"/||       |
+|GET        |/device/types/MyTestDeviceType/devices |||200             |=~/"serialNumber":"12345"/|1|       |
+|DELETE     |/device/types/MyTestDeviceType/devices/MyTestDevice1 |||204             |||       |
+|DELETE     |/device/types/MyTestDeviceType |||204             |||       |

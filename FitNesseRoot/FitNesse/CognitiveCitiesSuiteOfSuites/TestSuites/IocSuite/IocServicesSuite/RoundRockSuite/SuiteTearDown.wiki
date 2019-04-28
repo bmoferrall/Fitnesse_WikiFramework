@@ -1,0 +1,36 @@
+---
+Test
+---
+<test page>
+
+!define TEST_SYSTEM {slim}
+!path   ./CognitiveCitiesTesting.jar
+
+'''Include Datasource Tear Down'''
+
+#!include <IocSuite.IocHelperSuite.RoundRockHelperSuite.RoundRockFilterPanelTearDown
+
+#!include <IocSuite.IocHelperSuite.RoundRockHelperSuite.RrAreasDatasourceTearDown
+
+#!include <IocSuite.IocHelperSuite.RoundRockHelperSuite.RrLiquourPermitsDatasourceTearDown
+
+#!include <IocSuite.IocHelperSuite.RoundRockHelperSuite.Rr311CallsDatasourceTearDown
+
+#!include <IocSuite.IocHelperSuite.RoundRockHelperSuite.Rr911CallsDatasourceTearDown
+
+#!include <IocSuite.IocHelperSuite.RoundRockHelperSuite.RrBusStopsDatasourceTearDown
+
+#!include <IocSuite.IocHelperSuite.RoundRockHelperSuite.RrBusinessLicensesDatasourceTearDown
+
+#!include <IocSuite.IocHelperSuite.RoundRockHelperSuite.RrLiquourSellersDatasourceTearDown
+
+#!include <IocSuite.IocHelperSuite.RoundRockHelperSuite.RrPoliceIncidentsDatasourceTearDown
+
+#!include <IocSuite.IocHelperSuite.RoundRockHelperSuite.RrTempLiquourPermitsDatasourceTearDown
+
+
+'''Include main Suite Tear Down'''
+
+!include <IocServicesSuite.SuiteTearDown
+
+

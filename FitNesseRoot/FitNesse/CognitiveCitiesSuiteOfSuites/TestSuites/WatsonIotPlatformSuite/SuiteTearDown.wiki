@@ -1,0 +1,15 @@
+---
+Help: Clean up resources when the tests are completed
+Test
+---
+<test page>
+
+!define TEST_SYSTEM {slim}
+
+|Import                                 |
+|com.ibm.cognitivecities.fitnesse.rest.fixtures.setup    |
+|com.ibm.cognitivecities.fitnesse.database.fixtures.setup|
+
+!|ApplicationTearDown|
+
+!|DatabaseTearDown|

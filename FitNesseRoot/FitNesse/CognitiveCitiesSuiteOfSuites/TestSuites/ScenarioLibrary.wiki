@@ -1,0 +1,110 @@
+---
+Help: Library for reusable test scenarios
+Test
+---
+<test page>
+!define TEST_SYSTEM {slim}
+
+|import                        |
+|com.ibm.cognitivecities.fitnesse.scenarios.rest    |
+|com.ibm.cognitivecities.fitnesse.scenarios.database|
+|com.ibm.cognitivecities.fitnesse.scenarios.util|
+
+|library                  |
+|generic service scenarios|
+
+|scenario          |read service _ _ _ _ _   |serviceName,customHeaders,expectedCode,searchFor,expectedCount|
+|call read service;|@serviceName|@customHeaders                                             |
+|check             |service response code|@expectedCode                                |
+|check             |service response     |@searchFor                         |
+|check             |service result count |@expectedCount                     |
+|show              |service url                                              |
+|show              |service response                                         |
+|$RID=|service response id|
+
+|scenario            |create service _ _ _ _   |serviceName,requestBody,customHeaders,expectedCode|
+|call create service;|@serviceName         |@requestBody|@customHeaders           |
+|check               |service response code|@expectedCode                    |
+|show                |service url                                  |
+|show                |service response                             |
+|$RID=|service response id|
+
+|scenario            |update service _ _ _ _   |serviceName,requestBody,customHeaders,expectedCode|
+|call update service;|@serviceName         |@requestBody|@customHeaders           |
+|check               |service response code|@expectedCode                    |
+|show                |service url                                  |
+|show                |service response                             |
+
+|scenario            |delete service _ _ _ _   |serviceName,customHeaders,expectedCode,searchFor|
+|call delete service;|@serviceName   | @customHeaders                            |
+|check               |service response code|@expectedCode                  |
+|check               |service response     |@searchFor           |
+|show                |service url                                |
+|show                |service response                           |
+
+|scenario            |create multipart service _ _ _ _ _   |serviceName,filepathKey,filepathValue,additionalFields,expectedCode|
+|call multipart post service;|@serviceName         |@filepathKey|@filepathValue|@additionalFields           |
+|check               |service response code|@expectedCode                    |
+|show                |service url                                  |
+|show                |service response                             |
+|$RID=|service response id|
+
+|library           |
+|database scenarios|
+
+|scenario     |database read _ _ _ _ _ _ |connectionName,responseFormat,sqlStmt,searchFor,expectedCount,firstFieldValue|
+|execute read;|@connectionName          |@responseFormat                   |@sqlStmt                  |
+|check        |database response message|OK                                                           |
+|check        |database response        |@searchFor                                                   |
+|check        |database result count    |@expectedCount                                               |
+|check    |database first result field  |@firstFieldValue                                              |
+|show         |database response                                                                      |
+
+|scenario       |database create _ _      |connectionName,sqlStmt|
+|execute create;|@connectionName          |@sqlStmt              |
+|check          |database response message|OK                    |
+
+|scenario       |database update _ _      |connectionName,sqlStmt|
+|execute update;|@connectionName          |@sqlStmt              |
+|check          |database response message|OK                    |
+
+|scenario       |database delete _ _      |connectionName,sqlStmt|
+|execute delete;|@connectionName          |@sqlStmt              |
+|check          |database response message|OK                    |
+
+|library                  |
+|time scenarios|
+
+|scenario          |time delay _   |delayInMs|
+|pause execution;|@delayInMs|
+
+|scenario          |current time|
+|$CURRENTTIMESTAMP=|get current timestamp|
+
+|scenario          |format current time _|format|
+|$CURRENTTIMEFORMATTED=|get formatted current time;|@format|
+|check        |time util response message|OK                                                           |
+|show |time util response |
+
+|library           |
+|file scenarios|
+
+|scenario     |local file copy _ _  |sourceFile,targetFile|
+|copy file;|@sourceFile          |@targetFile          |
+|check        |file util response message|OK                                                           |
+|show         |file util response                                                                      |
+
+|scenario     |remote file copy _ _ _ _ _ _ |sourceFile,targetFile,host,user,keyPath,keyPassword|
+|copy file remote;|@sourceFile          |@targetFile|@host|@user|@keyPath|@keyPassword          |
+|check        |file util response message|OK                                                           |
+|show         |file util response                                                                      |
+
+|scenario     |local file delete _  |sourceFile|
+|delete file;|@sourceFile                    |
+|check        |file util response message|OK                                                           |
+|show         |file util response                                                                      |
+
+|scenario     |file search replace _ _ _ _  |sourceFile,searchReplacePairs,separator,pairSeparator|
+|replace strings in file;|@sourceFile          |@searchReplacePairs |@separator|@pairSeparator         |
+|check        |file util response message|OK                                                           |
+|show         |file util response                                                                      |

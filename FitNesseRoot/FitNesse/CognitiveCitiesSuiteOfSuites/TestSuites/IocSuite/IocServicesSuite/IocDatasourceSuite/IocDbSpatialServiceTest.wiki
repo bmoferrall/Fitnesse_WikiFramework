@@ -1,0 +1,26 @@
+<test page>
+!define TEST_SYSTEM {slim}
+!path   ./CognitiveCitiesTesting.jar
+
+| generic service validator fixture |
+| # comment | requestType | serviceName | requestBody | customHeaders | getResponseCode? | getResponseMessage? | getResponseId? | getResultCount? | getUrl? |
+| Read item ID=2 | GET | /spatial-service/features/$DSID_DB?criterion=Property_ID%3D2 | | | 200 | =~/(?i)"Name":"NAME2"/ | | 1 | |
+| Verify using valid start date filter | GET | /spatial-service/features/$DSID_DB?criterion=Property_ID%3D2&criterion=startDateTime%3E%3D2019-04-02T10%3A00%3A00-00%3A00 | | | 200 | =~/(?i)"Name":"NAME2"/ | | 1 | |
+| Test with out-of-range start date filter | GET | /spatial-service/features/$DSID_DB?criterion=Property_ID%3D2&criterion=startDateTime%3C%3D2019-01-01T00%3A00%3A00-00%3A00 | | | 200 | =~/(?i)"features":\[\]/ | | 1 | |
+
+'''Insert new record into source to update the NAME property of item ID=1 (ID columns is configured as 'used as id')'''
+
+| generic database fixture |
+| connectionName | statementType | statementText | responseFormat | getResponse? | getResultCount? | getResponseMessage? |
+| iocdb | create | insert into ioc.ds_source_table values (1,'NAME1 (Updated)','2019-04-04 12:00:00.0','POINT(-97.69575 30.590381)',CURRENT TIMESTAMP) | | | | OK |
+
+|script                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+|#''Wait at least 1 minute for IOC to ingest the new file (polling time is 1 minute)''|
+|time delay ;|115000|
+
+
+'''Verify that the NAME property was updated for item ID=1'''
+
+| generic service validator fixture |
+| # comment | requestType | serviceName | requestBody | customHeaders | getResponseCode? | getResponseMessage? | getResponseId? | getResultCount? | getUrl? |
+| Verify item was updated | GET | /spatial-service/features/$DSID_DB?criterion=Property_ID%3D1 | | | 200 | =~/(?i)"Name":"NAME1 \(Updated\)"/ | | 1 | |

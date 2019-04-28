@@ -1,0 +1,30 @@
+<test page>
+!define TEST_SYSTEM {slim}
+!path   ./CognitiveCitiesTesting.jar
+
+
+'''Create/read/update/read/delete system property '''
+
+|script                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+|#''Retrieve current timestamp''|
+|current time;|
+|#''Create new system property''|
+|create service;|/sysprop-service/sysprops/       | {"name":"FitnesseTestProperty","value":"{ \"hello\": \"world\", \"foo\": \"bar\" }","group":null,"description":{"group":"SyspropApp","key":"i18n_2c2fda66-5b71-4164-81ef-275badc226ce","resources":[{"group":"SyspropApp","locale":"en","key":"i18n_2c2fda66-5b71-4164-81ef-275badc226ce","value":"Temporary property created for test purposes"}]},"encrypted":false}      ||200|
+|#''Read back the new property''|
+|read service ;  |/sysprop-service/sysprops/$RID     ||200 |=~/\\"hello\\": ?\\"world\\"/                                                                                                                                                                                                                                  |1                                                                                                                                                                                                                          |
+|#''Update the value of the property''|
+|update service;|/sysprop-service/sysprops/$RID?forceUpdate=true       | {"id":$RID,"lastUpdateDate":$CURRENTTIMESTAMP,"name":"FitnesseTestProperty","value":"{ \"good\": \"bye\", \"foo\": \"bar\" }","description":{"group":"SyspropApp","key":"i18n_2c2fda66-5b71-4164-81ef-275badc226ce","resources":[{"group":"SyspropApp","locale":"en","key":"i18n_2c2fda66-5b71-4164-81ef-275badc226ce","value":"Temporary property created for test purposes"}]},"encrypted":false,"adminOnly":false,"group":null}      ||200|
+|#''Confirm the updated value''|
+|read service ;  |/sysprop-service/sysprops/$RID     ||200 |=~/\\"good\\": ?\\"bye\\"/                                                                                                                                                                                                                                  |1                                                                                                                                                                                                                          |
+|#''Delete the system property''|
+|delete service ;|/sysprop-service/sysprops/$RID ||204||
+
+'''Same as above, this time using a Decision Table instead of a Script Table'''
+
+|generic service validator fixture                                                                                                                                                  |
+|# Comment|requestType|serviceName                                                                                               |requestBody|customHeaders|getResponseCode?|getResponseMessage?|getResponseId?|getResultCount?|getUrl?|
+|Create new system property|POST        |/sysprop-service/sysprops/                        |{"name":"FitnesseTestProperty","value":"{ \"hello\": \"world\", \"foo\": \"bar\" }","group":null,"description":{"group":"SyspropApp","key":"i18n_2c2fda66-5b71-4164-81ef-275badc226ce","resources":[{"group":"SyspropApp","locale":"en","key":"i18n_2c2fda66-5b71-4164-81ef-275badc226ce","value":"Temporary property created for test purposes"}]},"encrypted":false}||200             ||$SPID=||       |
+|Verify it was created|GET        |/sysprop-service/sysprops/$SPID |||200             |=~/\\"hello\\": ?\\"world\\"/||1|       |
+|Update the value of the property|PUT        |/sysprop-service/sysprops/$SPID?forceUpdate=true |{"id":$SPID,"lastUpdateDate":$CURRENTTIMESTAMP,"name":"FitnesseTestProperty","value":"{ \"good\": \"bye\", \"foo\": \"bar\" }","description":{"group":"SyspropApp","key":"i18n_2c2fda66-5b71-4164-81ef-275badc226ce","resources":[{"group":"SyspropApp","locale":"en","key":"i18n_2c2fda66-5b71-4164-81ef-275badc226ce","value":"Temporary property created for test purposes"}]},"encrypted":false,"adminOnly":false,"group":null}||200             ||||       |
+|Verify the update|GET        |/sysprop-service/sysprops/$SPID |||200             |=~/\\"good\\": ?\\"bye\\"/||1|       |
+|Delete the property|DELETE     |/sysprop-service/sysprops/$SPID |||204             ||||       |

@@ -1,0 +1,5 @@
+---
+Help: Suite of Tests for Watson Iot Platform
+---
+!1 Watson Iot Platform Suite
+!contents -R2 -g -p -f -h

@@ -1,0 +1,23 @@
+---
+Help: Suite Set up for Datasource Tests
+Test
+---
+<test page>
+
+!define TEST_SYSTEM {slim}
+!path   ./CognitiveCitiesTesting.jar
+
+'''Include main Suite Set Up page'''
+
+!include <IocServicesSuite.SuiteSetUp
+
+'''Include Variable Definitions'''
+
+!include <IocServicesSuite.SetUpVariables
+
+'''Include Datasource Set Up'''
+
+!include <IocSuite.IocHelperSuite.CsvDatasourceSetUp
+
+!include <IocSuite.IocHelperSuite.DbDatasourceSetUp
+

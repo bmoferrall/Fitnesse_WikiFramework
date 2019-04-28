@@ -1,0 +1,100 @@
+---
+Help: Create, use and delete hotspot analytic using Round Rock 311 Calls data
+---
+<test page>
+
+!define TEST_SYSTEM {slim}
+!path   ./CognitiveCitiesTesting.jar
+
+'''Get hotspot type id'''
+
+| generic service validator fixture |
+| # comment | requestType | serviceName | requestBody | customHeaders | getResponseCode? | getResponseMessage? | getResponseId? | getResponseMap? | getResultCount? | getUrl? |
+| Get type id for hotspot analytic | GET | /analytic-service/types/1/?page=ioc.Operations&solution=IOC | | | 200 | =~/(?i)"name":"Hotspot"/ | | $MHOTSPOT= | 1 | |
+
+'''A few service calls before creating the hotspot analytic'''
+
+| generic service validator fixture |
+| # comment | requestType | serviceName | requestBody | customHeaders | getResponseCode? | getResponseMessage? | getResponseId? | getResultCount? | getUrl? |
+| Config service | GET | /analytic-service/config/?visibility=%7B%22scope%22%3A%5B%22public%22%2C%22private%22%5D%2C%22groups%22%3A%5B%5D%7D&criterion=deleteflag%3D0&criterion=deleteflag | | | 200 | =~/(?i)"type":"FeatureCollection"/ | | 1 | |
+| Instant Config service | GET | /analytic-service/config/instant/?visibility=%7B%22scope%22%3A%5B%22public%22%2C%22private%22%5D%2C%22groups%22%3A%5B%5D%7D&criterion=deleteflag%3D0&criterion=deleteflag%3D0&instant=true | | | 200 | =~/(?i)"type":"FeatureCollection"/ | | 1 | |
+| Tree model service | GET | /analytic-service/result/treeModel/?visibility=%7B%22scope%22%3A%5B%22private%22%2C%22public%22%2C%22groups%22%5D%2C%22groups%22%3A%5B%5D%7D&criterion=deleteflag%3D0&criterion=deleteflag | | | 200 | =~/(?i)"type":"FeatureCollection"/ | | 1 | |
+| Tabs service | GET | /analytic-service/config/tabs/ | | | 200 | =~/(?i)"tabId":"hotspotAnalysisTabData"/ | | >=68 | |
+| Types service | GET | /analytic-service/types/?page=ioc.Operations&solution=IOC | | | 200 | =~/(?i)"name":"Hotspot"/| | >=8 | |
+
+'''Save the value of objectid for each area'''
+
+| generic database fixture |
+| connectionName | statementType | statementText | responseFormat | getResponse? | getResultCount? | getResponseMessage? | getFirstResultField? |
+| iocdata | read | select objectid from ioc.target_table_${TT_NAME_RR_AREAS} where name='Central' | json | | 1 | OK | $ACENTRAL= |
+| iocdata | read | select objectid from ioc.target_table_${TT_NAME_RR_AREAS} where name='North' | json | | 1 | OK | $ANORTH= |
+| iocdata | read | select objectid from ioc.target_table_${TT_NAME_RR_AREAS} where name='West' | json | | 1 | OK | $AWEST= |
+
+'''Create and test the hotspot analytic'''
+
+| generic service validator fixture |
+| # comment | requestType | serviceName | requestBody | customHeaders | getResponseCode? | getResponseMessage? | getResponseId? | getResultCount? | getUrl? |
+| Create hotspot | POST | /analytic-service/config | {"id":-1,"name":{"group":"Analytic","key":"i18n_7977564f-6073-4cd0-891d-8f00b469be9a","resources":[{"group":"Analytic","locale":"en","key":"i18n_7977564f-6073-4cd0-891d-8f00b469be9a","value":"Hotspot Sample (Fitnesse)"}]},"description":{"group":"Analytic","key":"i18n_89ed87e1-a6e7-4cc4-865b-4452c559b4cb","resources":[{"group":"Analytic","locale":"en","key":"i18n_89ed87e1-a6e7-4cc4-865b-4452c559b4cb","value":"Hotspot sample description (Fitnesse)"}]},"analysisType":$`MHOTSPOT.analyticType`,"draft":false,"tabs":{"analysisTabGeneral":{"name":{"group":"Analytic","key":"i18n_7977564f-6073-4cd0-891d-8f00b469be9a","resources":[{"group":"Analytic","locale":"en","key":"i18n_7977564f-6073-4cd0-891d-8f00b469be9a","value":"Hotspot Sample (Fitnesse)"}]},"description":{"group":"Analytic","key":"i18n_89ed87e1-a6e7-4cc4-865b-4452c559b4cb","resources":[{"group":"Analytic","locale":"en","key":"i18n_89ed87e1-a6e7-4cc4-865b-4452c559b4cb","value":"Hotspot sample description (Fitnesse)"}]}},"analysisTabDate":{"type":"absolute","onlyOn":{"type":"any"},"relative":{"offset":-18,"unit":"months"},"absolute":{"start":{"after":{"date":"2018-04-01","time":"T00:00:00","dateTime":"2018-04-01T00:00:00-00:00"},"before":{"date":"2019-04-01","time":"T23:59:59","dateTime":"2019-04-01T23:59:59-00:00"}},"end":{"after":{"date":null,"time":null,"dateTime":null},"before":{"date":null,"time":null,"dateTime":null}}}},"analysisTabArea":{"namedAreaIdList":[{"areaId":$ACENTRAL,"areaDatasourceId":$DSID_RRAREAS},{"areaId":$AWEST,"areaDatasourceId":$DSID_RRAREAS},{"areaId":$ANORTH,"areaDatasourceId":$DSID_RRAREAS}]},"analysisTabData":{"query":{"$DSID_RR311CALLS":[{"ignoreDateTime":false}]}},"hotspotAnalysisTabData":{"hotspotType":1,"temporalDistance":1,"spatialDistance":200,"distanceUnits":1,"visualizationCode":1,"minPointsInCluster":2},"analysisTabAlerting":{"notification":"true","gridData":[{"name":"sysadmin","type":"User","notify":1}]},"analysisTabScheduling":[{"id":-1,"viewId":-1,"scheduledToRun":true,"schedulerType":"interval","frequency":"daily","repeatInterval":86400000,"time":"T06:00:00","start":1556082000000,"timezone":"Europe/London"}],"analysisTabLegend":{"opacityList":["0.1","0.2","0.3","0.4","0.5","0.6","0.7","0.8","0.9","1.0"],"legendMode":"bad","colorList":[{"label":"{\"group\":\"Analytic\",\"key\":\"6fecd7d8-bab8-4151-bd00-f66907bf9c53\"}","value":20,"alert":false,"color":"#000000","status":"messaging_status_hotspot_trivial","severity":1},{"label":"{\"group\":\"Analytic\",\"key\":\"48f916fb-fa13-4422-9104-e4524a8efc49\"}","value":40,"alert":false,"color":"#008000","status":"messaging_status_hotspot_low","severity":2},{"label":"{\"group\":\"Analytic\",\"key\":\"32ee680a-f716-40ec-8a1d-c97b3a007879\"}","value":60,"alert":true,"color":"#ffd700","status":"messaging_status_hotspot_moderate","severity":3},{"label":"{\"group\":\"Analytic\",\"key\":\"55423d93-6aaa-4794-a9ec-fefa1bda5270\"}","value":80,"alert":true,"color":"#8b008b","status":"messaging_status_hotspot_important","severity":4},{"label":"{\"group\":\"Analytic\",\"key\":\"597c7384-f727-4002-a067-71bc8b6500d5\"}","value":100,"alert":true,"color":"#ff0000","status":"messaging_status_hotspot_critical","severity":5}],"timeInterval":"Weekly","opacity":0.5,"columns":["Name","EndValue","Alert","Color"],"endValueType":""}},"runOnSave":false} | | 200 | =~/(?i)"i18nLabel":"Hotspot Sample \(Fitnesse\)"/ | $HOTSPOTID= | 1 | |
+| Tree model service | GET | /analytic-service/result/treeModel/?visibility=%7B%22scope%22%3A%5B%22private%22%2C%22public%22%2C%22groups%22%5D%2C%22groups%22%3A%5B%5D%7D&criterion=deleteflag | | | 200 | =~/(?i)"areaName":"_all_"/ | | 1 | |
+| Config service | GET | /analytic-service/config/?visibility=%7B%22scope%22%3A%5B%22public%22%2C%22private%22%5D%2C%22groups%22%3A%5B%5D%7D&criterion=deleteflag%3D0&criterion=deleteflag | | | 200 | =~/(?i)"i18nLabel":"Hotspot Sample \(Fitnesse\)"/ | | 1 | |
+
+'''Get the datasource id of the hotspot from the 'datasourceId' field'''
+
+|generic database fixture                                                                                                                                                                                                        |
+|connectionName|statementType|statementText                                                                                                       |responseFormat|getResponse?               |getResultCount?|getResponseMessage?|getFirstResultField?|
+|iocdb           |read         |select id from ioc.datasource_sources where upper(name)='HOTSPOT_$HOTSPOTID'      |json          |              |1              |OK                 |$DSID_HOTSPOT=|
+
+'''Run the analysis'''
+
+| generic service validator fixture |
+| # comment | requestType | serviceName | requestBody | customHeaders | getResponseCode? | getResponseMessage? | getResponseId? | getResultCount? | getUrl? |
+| Run analysis | POST | /analytic-service/config/$HOTSPOTID/run |  | | 200 | | |  | |
+
+'''Pause for analysis to run'''
+
+|script                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+|#''Wait 2.5 minutes for analysis to complete''|
+|time delay ;|150000|
+
+''''Run some data verifications on the target table'''
+
+| generic database fixture |
+| connectionName | statementType | statementText | responseFormat | getResponse? | getResultCount? | getResponseMessage? | getFirstResultField? |
+| iocdata | read | select count(objectid) as ocnt from ioc.target_table_hotspot_$HOTSPOTID | json |  | 1 | OK | 169 |
+| iocdata | read | select min(clusterpointscount) as mincpc from ioc.target_table_hotspot_$HOTSPOTID | json | | 1 | OK | 2 |
+| iocdata | read | select max(clusterpointscount) as maxcps from ioc.target_table_hotspot_$HOTSPOTID | json | | 1 | OK | 9 |
+| iocdata | read | select min(score) as minscore from ioc.target_table_hotspot_$HOTSPOTID | json | | 1 | OK | 4.0 |
+| iocdata | read | select max(score) as maxscore from ioc.target_table_hotspot_$HOTSPOTID | json | | 1 | OK | 45.0 |
+| iocdata | read | select avg(score) as avgscore from ioc.target_table_hotspot_$HOTSPOTID | json | | 1 | OK | 10.6 < _ < 10.7 |
+| iocdata | read | select min(radius) as minradius from ioc.target_table_hotspot_$HOTSPOTID | json | | 1 | OK | 0.0 |
+| iocdata | read | select max(radius) as maxradius from ioc.target_table_hotspot_$HOTSPOTID | json | | 1 | OK | 420.57 |
+| iocdata | read | select avg(radius) as avgradius from ioc.target_table_hotspot_$HOTSPOTID | json | | 1 | OK | 64.0 < _ < 64.1 |
+
+'''Result Interval Services'''
+
+| generic service validator fixture |
+| # comment | requestType | serviceName | requestBody | customHeaders | getResponseCode? | getResponseMessage? | getResponseId? | getResultCount? | getUrl? |
+| Get named area details | GET | /spatial-service/namedareas/$DSID_RRAREAS/?namedAreas=$ANORTH | | | 200 | =~/(?i)"id":$ANORTH/ | | 1 | |
+| Get result intervals for north area | GET | /analytic-service/result/interval/$HOTSPOTID?areaDatasourceId=$DSID_RRAREAS&areaId=$ANORTH | | | 200 | =~/(?i)"i18nLabel":"Hotspot Sample \(Fitnesse\)"/ |  | 1 | |
+| Get first result | GET | /analytic-service/result/$`MHOTSPOT.analyticType`/$DSID_HOTSPOT/?criterion=startDateTime%3E%3D2018-04-01T00%3A00%3A00%2B01%3A00&criterion=startDateTime%3C2018-04-08T00%3A00%3A00%2B01%3A00&criterion=deleteflag%3D0&areas=%5B%7B%22wkt%22%3Anull%2C%22areaId%22%3A$ANORTH%2C%22areaDatasourceId%22%3A$DSID_RRAREAS%2C%22key%22%3A%22$ANORTH-$DSID_RRAREAS%22%7D%5D | | | 200 | =~/(?i)"type":"FeatureCollection"/ | | 1 | |
+| Get second result | GET | /analytic-service/result/$`MHOTSPOT.analyticType`/$DSID_HOTSPOT/?criterion=startDateTime%3E%3D2018-04-08T00%3A00%3A00%2B01%3A00&criterion=startDateTime%3C2018-04-14T00%3A00%3A00%2B01%3A00&criterion=deleteflag%3D0&areas=%5B%7B%22wkt%22%3Anull%2C%22areaId%22%3A$ANORTH%2C%22areaDatasourceId%22%3A$DSID_RRAREAS%2C%22key%22%3A%22$ANORTH-$DSID_RRAREAS%22%7D%5D | | | 200 | =~/(?i)"areaId":$ANORTH/ | | 1 | |
+| Get later result | GET | /analytic-service/result/$`MHOTSPOT.analyticType`/$DSID_HOTSPOT/?criterion=startDateTime%3E%3D2018-12-09T00%3A00%3A00%2B01%3A00&criterion=startDateTime%3C2018-12-16T00%3A00%3A00%2B01%3A00&criterion=deleteflag%3D0&areas=%5B%7B%22wkt%22%3Anull%2C%22areaId%22%3A$ANORTH%2C%22areaDatasourceId%22%3A$DSID_RRAREAS%2C%22key%22%3A%22$ANORTH-$DSID_RRAREAS%22%7D%5D | | | 200 | =~/(?i)"areaId":$ANORTH/ | | 1 | |
+| Get last result | GET | /analytic-service/result/$`MHOTSPOT.analyticType`/$DSID_HOTSPOT/?criterion=startDateTime%3E%3D2019-03-31T00%3A00%3A00%2B01%3A00&criterion=startDateTime%3C2019-04-01T00%3A00%3A00%2B01%3A00&criterion=deleteflag%3D0&areas=%5B%7B%22wkt%22%3Anull%2C%22areaId%22%3A$ANORTH%2C%22areaDatasourceId%22%3A$DSID_RRAREAS%2C%22key%22%3A%22$ANORTH-$DSID_RRAREAS%22%7D%5D | | | 200 | =~/(?i)"type":"FeatureCollection"/ | | 1 | |
+
+'''Update Analytic'''
+
+| generic service validator fixture |
+| # comment | requestType | serviceName | requestBody | customHeaders | getResponseCode? | getResponseMessage? | getResponseId? | getResultCount? | getUrl? |
+| Update hotspot | PUT | /analytic-service/config | {"id":$HOTSPOTID,"name":{"group":"Analytic","key":"i18n_7977564f-6073-4cd0-891d-8f00b469be9a","resources":[{"group":"Analytic","locale":"en","key":"i18n_7977564f-6073-4cd0-891d-8f00b469be9a","value":"Hotspot Sample (Fitnesse)"}]},"description":{"group":"Analytic","key":"i18n_89ed87e1-a6e7-4cc4-865b-4452c559b4cb","resources":[{"group":"Analytic","locale":"en","key":"i18n_89ed87e1-a6e7-4cc4-865b-4452c559b4cb","value":"Hotspot sample description (Fitnesse)"}]},"analysisType":$`MHOTSPOT.analyticType`,"draft":false,"tabs":{"analysisTabGeneral":{"name":{"group":"Analytic","key":"i18n_7977564f-6073-4cd0-891d-8f00b469be9a","resources":[{"group":"Analytic","locale":"en","key":"i18n_7977564f-6073-4cd0-891d-8f00b469be9a","value":"Hotspot Sample (Fitnesse)"}]},"description":{"group":"Analytic","key":"i18n_89ed87e1-a6e7-4cc4-865b-4452c559b4cb","resources":[{"group":"Analytic","locale":"en","key":"i18n_89ed87e1-a6e7-4cc4-865b-4452c559b4cb","value":"Hotspot sample description (Fitnesse)"}]}},"analysisTabDate":{"type":"absolute","onlyOn":{"type":"any"},"relative":{"offset":-18,"unit":"months"},"absolute":{"start":{"after":{"date":"2018-04-01","time":"T00:00:00","dateTime":"2018-04-01T00:00:00-00:00"},"before":{"date":"2019-04-01","time":"T23:59:59","dateTime":"2019-04-01T23:59:59-00:00"}},"end":{"after":{"date":null,"time":null,"dateTime":null},"before":{"date":null,"time":null,"dateTime":null}}}},"analysisTabArea":{"namedAreaIdList":[{"areaId":$ACENTRAL,"areaDatasourceId":$DSID_RRAREAS},{"areaId":$AWEST,"areaDatasourceId":$DSID_RRAREAS},{"areaId":$ANORTH,"areaDatasourceId":$DSID_RRAREAS}]},"analysisTabData":{"query":{"$DSID_RR311CALLS":[{"ignoreDateTime":false}]}},"hotspotAnalysisTabData":{"hotspotType":1,"temporalDistance":1,"spatialDistance":200,"distanceUnits":1,"visualizationCode":1,"minPointsInCluster":2},"analysisTabAlerting":{"notification":"true","gridData":[{"name":"sysadmin","type":"User","notify":1}]},"analysisTabScheduling":[{"id":$HOTSPOTID,"viewId":$HOTSPOTID,"scheduledToRun":false,"schedulerType":"interval","frequency":"daily","repeatInterval":86400000,"time":"T06:00:00","start":1556082000000,"timezone":"Europe/London"}],"analysisTabLegend":{"opacityList":["0.1","0.2","0.3","0.4","0.5","0.6","0.7","0.8","0.9","1.0"],"legendMode":"bad","colorList":[{"label":"{\"group\":\"Analytic\",\"key\":\"6fecd7d8-bab8-4151-bd00-f66907bf9c53\"}","value":20,"alert":false,"color":"#000000","status":"messaging_status_hotspot_trivial","severity":1},{"label":"{\"group\":\"Analytic\",\"key\":\"48f916fb-fa13-4422-9104-e4524a8efc49\"}","value":40,"alert":false,"color":"#008000","status":"messaging_status_hotspot_low","severity":2},{"label":"{\"group\":\"Analytic\",\"key\":\"32ee680a-f716-40ec-8a1d-c97b3a007879\"}","value":60,"alert":true,"color":"#ffd700","status":"messaging_status_hotspot_moderate","severity":3},{"label":"{\"group\":\"Analytic\",\"key\":\"55423d93-6aaa-4794-a9ec-fefa1bda5270\"}","value":80,"alert":true,"color":"#8b008b","status":"messaging_status_hotspot_important","severity":4},{"label":"{\"group\":\"Analytic\",\"key\":\"597c7384-f727-4002-a067-71bc8b6500d5\"}","value":100,"alert":true,"color":"#ff0000","status":"messaging_status_hotspot_critical","severity":5}],"timeInterval":"Weekly","opacity":0.5,"columns":["Name","EndValue","Alert","Color"],"endValueType":""}},"runOnSave":false} | | 200 | =~/(?i)"i18nLabel":"Hotspot Sample \(Fitnesse\)"/ | | 1 | |
+
+'''Verify the target table was cleared'''
+
+| generic database fixture |
+| connectionName | statementType | statementText | responseFormat | getResponse? | getResultCount? | getResponseMessage? | getFirstResultField? |
+| iocdata | read | select count(objectid) as ocnt from ioc.target_table_hotspot_$HOTSPOTID | json | | 1 | OK | 0 |
+
+'''Delete Analytic'''
+
+| generic service validator fixture |
+| # comment | requestType | serviceName | requestBody | customHeaders | getResponseCode? | getResponseMessage? | getResponseId? | getResultCount? | getUrl? |
+| Delete hotspot | DELETE | /analytic-service/config/$HOTSPOTID | | | 200 | | |  | |

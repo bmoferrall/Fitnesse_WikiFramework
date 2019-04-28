@@ -1,0 +1,118 @@
+<test page>
+
+!define TEST_SYSTEM {slim}
+!path   ./CognitiveCitiesTesting.jar
+
+'''Test variations of the about-service'''
+
+| script |
+| #''Read swidtags'' |
+| read service ; | /about-service/swidtags/ | | 200 | =~/"name": ?"IBM Intelligent Operations Center"/ | >=1 |
+| #''Read swtags'' |
+| read service ; | /about-service/swtags/ | | 200 | =~/"productName": ?"IBM Installation Manager"/ | >=1 |
+| #''Read cmptags'' |
+| read service ; | /about-service/cmptags/ | | 200 | | >=0 |
+| #''Read fxtags'' |
+| read service ; | /about-service/fxtags/ | | 200 | | >=0 |
+
+!include <IocServicesSuite.SetUpVariables
+
+| generic database fixture |
+| connectionName | statementType | statementText | responseFormat | getResponse? | getResultCount? | getResponseMessage? | getFirstResultField? |
+| iocdb | read | select id from ioc.datasource_sources where name='RR_911_Calls_Fitnesse' | json | | 1 | OK | $DSID_RR911CALLS= |
+| iocdb | read | select id from ioc.datasource_sources where name='RR_311_Calls_Fitnesse' | json | | 1 | OK | $DSID_RR311CALLS= |
+| iocdb | read | select id from ioc.datasource_sources where name='RR_Areas_Fitnesse' | json | | 1 | OK | $DSID_RRAREAS= |
+| iocdb | read | select id from ioc.datasource_sources where name='RR_Police_Incidents_Fitnesse' | json | | 1 | OK | $DSID_RRPOLINC= |
+
+'''Get weighted hotspot type id'''
+
+| generic service validator fixture |
+| # comment | requestType | serviceName | requestBody | customHeaders | getResponseCode? | getResponseMessage? | getResponseId? | getResponseMap? | getResultCount? | getUrl? |
+| Get type id for weighted hotspot analytic | GET | /analytic-service/types/2/?page=ioc.Operations&solution=IOC | | | 200 | =~/(?i)"name":"WeightedHotspot"/ | | $MWHOTSPOT= | 1 | |
+
+'''A few service calls before creating the weighted hotspot analytic'''
+
+| generic service validator fixture |
+| # comment | requestType | serviceName | requestBody | customHeaders | getResponseCode? | getResponseMessage? | getResponseId? | getResultCount? | getUrl? |
+| Config service | GET | /analytic-service/config/?visibility=%7B%22scope%22%3A%5B%22public%22%2C%22private%22%5D%2C%22groups%22%3A%5B%5D%7D&criterion=deleteflag%3D0&criterion=deleteflag | | | 200 | =~/(?i)"type":"FeatureCollection"/ | | 1 | |
+| Instant Config service | GET | /analytic-service/config/instant/?visibility=%7B%22scope%22%3A%5B%22public%22%2C%22private%22%5D%2C%22groups%22%3A%5B%5D%7D&criterion=deleteflag%3D0&criterion=deleteflag%3D0&instant=true | | | 200 | =~/(?i)"type":"FeatureCollection"/ | | 1 | |
+| Tree model service | GET | /analytic-service/result/treeModel/?visibility=%7B%22scope%22%3A%5B%22private%22%2C%22public%22%2C%22groups%22%5D%2C%22groups%22%3A%5B%5D%7D&criterion=deleteflag%3D0&criterion=deleteflag | | | 200 | =~/(?i)"type":"FeatureCollection"/ | | 1 | |
+| Tabs service | GET | /analytic-service/config/tabs/ | | | 200 | =~/(?i)"tabId":"analysisTabWeight"/ | | >=68 | |
+| Types service | GET | /analytic-service/types/?page=ioc.Operations&solution=IOC | | | 200 | =~/(?i)"name":"WeightedHotspot"/| | >=8 | |
+
+'''Save the value of objectid for each area'''
+
+| generic database fixture |
+| connectionName | statementType | statementText | responseFormat | getResponse? | getResultCount? | getResponseMessage? | getFirstResultField? |
+| iocdata | read | select objectid from ioc.target_table_${TT_NAME_RR_AREAS} where name='Central' | json | | 1 | OK | $ACENTRAL= |
+| iocdata | read | select objectid from ioc.target_table_${TT_NAME_RR_AREAS} where name='North' | json | | 1 | OK | $ANORTH= |
+| iocdata | read | select objectid from ioc.target_table_${TT_NAME_RR_AREAS} where name='West' | json | | 1 | OK | $AWEST= |
+
+'''Create and test the weighted hotspot analytic'''
+
+| generic service validator fixture |
+| # comment | requestType | serviceName | requestBody | customHeaders | getResponseCode? | getResponseMessage? | getResponseId? | getResultCount? | getUrl? |
+| Create weighted hotspot | POST | /analytic-service/config | {"id":-1,"name":{"group":"Analytic","key":"i18n_6af4ef72-444a-42b2-8ef4-2ae01098b614","resources":[{"group":"Analytic","locale":"en","key":"i18n_6af4ef72-444a-42b2-8ef4-2ae01098b614","value":"Weighted Hotspot Sample (Fitnesse)"}]},"description":{"group":"Analytic","key":"i18n_57e18378-12f2-4993-818e-2309c3f5ba21","resources":[{"group":"Analytic","locale":"en","key":"i18n_57e18378-12f2-4993-818e-2309c3f5ba21","value":"Weighted hotspot sample description (Fitnesse)"}]},"analysisType":$`MWHOTSPOT.analyticType`,"draft":false,"tabs":{"analysisTabGeneral":{"name":{"group":"Analytic","key":"i18n_6af4ef72-444a-42b2-8ef4-2ae01098b614","resources":[{"group":"Analytic","locale":"en","key":"i18n_6af4ef72-444a-42b2-8ef4-2ae01098b614","value":"Weighted Hotspot Sample (Fitnesse)"}]},"description":{"group":"Analytic","key":"i18n_57e18378-12f2-4993-818e-2309c3f5ba21","resources":[{"group":"Analytic","locale":"en","key":"i18n_57e18378-12f2-4993-818e-2309c3f5ba21","value":"Weighted hotspot sample description (Fitnesse)"}]}},"analysisTabDate":{"type":"absolute","onlyOn":{"type":"any"},"relative":{"offset":-1,"unit":"months"},"absolute":{"start":{"after":{"date":"2018-04-01","time":"T00:00:00","dateTime":"2018-04-01T00:00:00-00:00"},"before":{"date":"2019-04-01","time":"T23:59:59","dateTime":"2019-04-01T23:59:59-00:00"}},"end":{"after":{"date":null,"time":null,"dateTime":null},"before":{"date":null,"time":null,"dateTime":null}}}},"analysisTabArea":{"namedAreaIdList":[{"areaId":$ACENTRAL,"areaDatasourceId":$DSID_RRAREAS},{"areaId":$AWEST,"areaDatasourceId":$DSID_RRAREAS},{"areaId":$ANORTH,"areaDatasourceId":$DSID_RRAREAS}]},"analysisTabData":{"query":{"$DSID_RRPOLINC":[{"ignoreDateTime":false}]}},"hotspotAnalysisTabData":{"hotspotType":1,"temporalDistance":1,"spatialDistance":200,"distanceUnits":1,"visualizationCode":1,"minPointsInCluster":2},"analysisTabWeight":{"layers":[{"id":$DSID_RRPOLINC,"name":{"group":"Sample","key":"roundRockPoliceIncidents","i18nLabel":"Police Incidents"},"type":"CSV","attributes":[{"id":"offense","name":"5","displayName":{"group":"DataSourceI18n","key":"i18n_c02deea2-f5d1-4e1a-b551-b959121aa2d9","i18nLabel":"offense"},"operation":"EQUALS","selected":true,"ranges":[{"id":0,"operation":"equals","value":"THEFT","weight":1},{"id":1,"operation":"equals","value":"ARSON","weight":2},{"id":2,"operation":"equals","value":"BURGB","weight":3},{"id":3,"operation":"equals","value":"BOMB","weight":10},{"id":4,"operation":"equals","value":"ASLT1","weight":5},{"id":5,"operation":"equals","value":"WT","weight":1},{"id":6,"operation":"equals","value":"BURGD","weight":4}],"type":"VARCHAR","markSelected":false,"timeframeUnits":"days"},{"id":"address","name":"6","displayName":{"group":"DataSourceI18n","key":"i18n_41fed7fd-48e8-44b0-b1fd-3301f92bde76","i18nLabel":"address"},"selected":false,"ranges":[],"type":"VARCHAR","markSelected":false},{"id":"ARREST","name":"8","displayName":{"group":"DataSourceI18n","key":"i18n_c345f5c9-2799-4733-a433-137535037e4a","i18nLabel":"ARREST"},"selected":false,"ranges":[],"type":"VARCHAR"},{"id":"OFFENSE_CODE","name":"9","displayName":{"group":"DataSourceI18n","key":"i18n_e94b4e68-cd0a-45d7-87b9-32694f058c62","i18nLabel":"OFFENSE_CODE"},"selected":false,"ranges":[],"type":"VARCHAR"}]}]},"analysisTabGrouping":[{"id":$DSID_RRPOLINC,"name":"Police Incidents","group":"address"}],"analysisTabAlerting":{"notification":"true","gridData":[{"name":"sysadmin","type":"User","notify":1}]},"analysisTabScheduling":[{"id":-1,"viewId":-1,"scheduledToRun":false,"schedulerType":"interval","frequency":"daily","repeatInterval":86400000,"time":"T00:00:00","start":1556233200000,"timezone":"Europe/London"}],"analysisTabLegend":{"opacityList":["0.1","0.2","0.3","0.4","0.5","0.6","0.7","0.8","0.9","1.0"],"legendMode":"bad","colorList":[{"label":"{\"group\":\"Analytic\",\"key\":\"cbf63f42-0590-40b7-aef9-392b4083593c\"}","value":20,"alert":false,"color":"#000000","status":"messaging_status_hotspot_trivial","severity":1},{"label":"{\"group\":\"Analytic\",\"key\":\"91f06086-387d-40ba-8b55-af128a2746ec\"}","value":40,"alert":false,"color":"#008000","status":"messaging_status_hotspot_low","severity":2},{"label":"{\"group\":\"Analytic\",\"key\":\"973a9c1e-ab26-4295-89f4-7d66a579dd88\"}","value":60,"alert":true,"color":"#ffd700","status":"messaging_status_hotspot_moderate","severity":3},{"label":"{\"group\":\"Analytic\",\"key\":\"9389e7b4-bd02-4287-84f0-a6d09179a5dd\"}","value":80,"alert":true,"color":"#8b008b","status":"messaging_status_hotspot_important","severity":4},{"label":"{\"group\":\"Analytic\",\"key\":\"2c8451dc-4575-470d-a5e5-7f9b1b55538a\"}","value":100,"alert":true,"color":"#ff0000","status":"messaging_status_hotspot_critical","severity":5}],"timeInterval":"Weekly","opacity":0.5,"columns":["Name","EndValue","Alert","Color"],"endValueType":""}},"runOnSave":false} | | 200 | =~/(?i)"i18nLabel":"Weighted Hotspot Sample \(Fitnesse\)"/ | $WHOTSPOTID= | 1 | |
+| Tree model service | GET | /analytic-service/result/treeModel/?visibility=%7B%22scope%22%3A%5B%22private%22%2C%22public%22%2C%22groups%22%5D%2C%22groups%22%3A%5B%5D%7D&criterion=deleteflag | | | 200 | =~/(?i)"areaName":"_all_"/ | | 1 | |
+| Config service | GET | /analytic-service/config/?visibility=%7B%22scope%22%3A%5B%22public%22%2C%22private%22%5D%2C%22groups%22%3A%5B%5D%7D&criterion=deleteflag%3D0&criterion=deleteflag | | | 200 | =~/(?i)"i18nLabel":"Weighted Hotspot Sample \(Fitnesse\)"/ | | 1 | |
+
+'''Get the datasource id of the weighted hotspot from the 'datasourceId' field'''
+
+|generic database fixture                                                                                                                                                                                                        |
+|connectionName|statementType|statementText                                                                                                       |responseFormat|getResponse?               |getResultCount?|getResponseMessage?|getFirstResultField?|
+|iocdb           |read         |select id from ioc.datasource_sources where upper(name)='WEIGHTEDHOTSPOT_$WHOTSPOTID'      |json          |              |1              |OK                 |$DSID_WHOTSPOT=|
+
+'''Run the analysis'''
+
+| generic service validator fixture |
+| # comment | requestType | serviceName | requestBody | customHeaders | getResponseCode? | getResponseMessage? | getResponseId? | getResultCount? | getUrl? |
+| Run analysis | POST | /analytic-service/config/$WHOTSPOTID/run |  | | 200 | | |  | |
+
+'''Pause for analysis to run'''
+
+|script                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+|#''Wait 2.5 minutes for analysis to complete''|
+|time delay ;|150000|
+
+'''Run some data verifications on the target table'''
+
+| generic database fixture |
+| connectionName | statementType | statementText | responseFormat | getResponse? | getResultCount? | getResponseMessage? | getFirstResultField? |
+| iocdata | read | select count(objectid) as ocnt from ioc.target_table_weightedhotspot_$WHOTSPOTID | json |  | 1 | OK | 353 |
+| iocdata | read | select min(clusterpointscount) as mincpc from ioc.target_table_weightedhotspot_$WHOTSPOTID | json | | 1 | OK | 2 |
+| iocdata | read | select max(clusterpointscount) as maxcps from ioc.target_table_weightedhotspot_$WHOTSPOTID | json | | 1 | OK | 16 |
+| iocdata | read | select min(score) as minscore from ioc.target_table_weightedhotspot_$WHOTSPOTID | json | | 1 | OK | 10.0 |
+| iocdata | read | select max(score) as maxscore from ioc.target_table_weightedhotspot_$WHOTSPOTID | json | | 1 | OK | 100.0 |
+| iocdata | read | select avg(score) as avgscore from ioc.target_table_weightedhotspot_$WHOTSPOTID | json | | 1 | OK | 34.3 < _ < 34.5 |
+| iocdata | read | select min(radius) as minradius from ioc.target_table_weightedhotspot_$WHOTSPOTID | json | | 1 | OK | 0.0 |
+| iocdata | read | select max(radius) as maxradius from ioc.target_table_weightedhotspot_$WHOTSPOTID | json | | 1 | OK | 233.16 |
+| iocdata | read | select avg(radius) as avgradius from ioc.target_table_weightedhotspot_$WHOTSPOTID | json | | 1 | OK | 16.6 < _ < 16.8 |
+
+'''Result Interval Services'''
+
+| generic service validator fixture |
+| # comment | requestType | serviceName | requestBody | customHeaders | getResponseCode? | getResponseMessage? | getResponseId? | getResultCount? | getUrl? |
+| Get named area details | GET | /spatial-service/namedareas/$DSID_RRAREAS/?namedAreas=$ACENTRAL | | | 200 | =~/(?i)"id":$ACENTRAL/ | | 1 | |
+| Get result intervals for north area | GET | /analytic-service/result/interval/$WHOTSPOTID?areaDatasourceId=$DSID_RRAREAS&areaId=$ACENTRAL | | | 200 | =~/(?i)"i18nLabel":"Weighted Hotspot Sample \(Fitnesse\)"/ |  | 1 | |
+| Get first result | GET | /analytic-service/result/$`MWHOTSPOT.analyticType`/$DSID_WHOTSPOT/?criterion=startDateTime%3E%3D2018-04-01T00%3A00%3A00%2B01%3A00&criterion=startDateTime%3C2018-04-08T00%3A00%3A00%2B01%3A00&criterion=deleteflag%3D0&areas=%5B%7B%22wkt%22%3Anull%2C%22areaId%22%3A$ACENTRAL%2C%22areaDatasourceId%22%3A$DSID_RRAREAS%2C%22key%22%3A%22$ACENTRAL-$DSID_RRAREAS%22%7D%5D | | | 200 | =~/(?i)"areaId":$ACENTRAL/ | | 1 | |
+| Get second result | GET | /analytic-service/result/$`MWHOTSPOT.analyticType`/$DSID_WHOTSPOT/?criterion=startDateTime%3E%3D2018-04-08T00%3A00%3A00%2B01%3A00&criterion=startDateTime%3C2018-04-15T00%3A00%3A00%2B01%3A00&criterion=deleteflag%3D0&areas=%5B%7B%22wkt%22%3Anull%2C%22areaId%22%3A$ACENTRAL%2C%22areaDatasourceId%22%3A$DSID_RRAREAS%2C%22key%22%3A%22$ACENTRAL-$DSID_RRAREAS%22%7D%5D | | | 200 | =~/(?i)"areaId":$ACENTRAL/ | | 1 | |
+| Get later result | GET | /analytic-service/result/$`MWHOTSPOT.analyticType`/$DSID_WHOTSPOT/?criterion=startDateTime%3E%3D2018-09-16T00%3A00%3A00%2B01%3A00&criterion=startDateTime%3C2018-09-23T00%3A00%3A00%2B01%3A00&criterion=deleteflag%3D0&areas=%5B%7B%22wkt%22%3Anull%2C%22areaId%22%3A$ACENTRAL%2C%22areaDatasourceId%22%3A$DSID_RRAREAS%2C%22key%22%3A%22$ACENTRAL-$DSID_RRAREAS%22%7D%5D | | | 200 | =~/(?i)"areaId":$ACENTRAL/ | | 1 | |
+| Get last result | GET | /analytic-service/result/$`MWHOTSPOT.analyticType`/$DSID_WHOTSPOT/?criterion=startDateTime%3E%3D2019-03-31T00%3A00%3A00%2B00%3A00&criterion=startDateTime%3C2019-04-01T23%3A59%3A59%2B01%3A00&criterion=deleteflag%3D0&areas=%5B%7B%22wkt%22%3Anull%2C%22areaId%22%3A$ACENTRAL%2C%22areaDatasourceId%22%3A$DSID_RRAREAS%2C%22key%22%3A%22$ACENTRAL-$DSID_RRAREAS%22%7D%5D | | | 200 | =~/(?i)"type":"FeatureCollection"/ | | 1 | |
+
+'''Update Analytic'''
+
+| generic service validator fixture |
+| # comment | requestType | serviceName | requestBody | customHeaders | getResponseCode? | getResponseMessage? | getResponseId? | getResultCount? | getUrl? |
+| Update weighted hotspot | PUT | /analytic-service/config | {"id":$WHOTSPOTID,"name":{"group":"Analytic","key":"i18n_6af4ef72-444a-42b2-8ef4-2ae01098b614","resources":[{"group":"Analytic","locale":"en","key":"i18n_6af4ef72-444a-42b2-8ef4-2ae01098b614","value":"Weighted Hotspot Sample (Fitnesse)"}]},"description":{"group":"Analytic","key":"i18n_57e18378-12f2-4993-818e-2309c3f5ba21","resources":[{"group":"Analytic","locale":"en","key":"i18n_57e18378-12f2-4993-818e-2309c3f5ba21","value":"Weighted hotspot sample description (Fitnesse)"}]},"analysisType":$`MWHOTSPOT.analyticType`,"draft":false,"tabs":{"analysisTabGeneral":{"name":{"group":"Analytic","key":"i18n_6af4ef72-444a-42b2-8ef4-2ae01098b614","resources":[{"group":"Analytic","locale":"en","key":"i18n_6af4ef72-444a-42b2-8ef4-2ae01098b614","value":"Weighted Hotspot Sample (Fitnesse)"}]},"description":{"group":"Analytic","key":"i18n_57e18378-12f2-4993-818e-2309c3f5ba21","resources":[{"group":"Analytic","locale":"en","key":"i18n_57e18378-12f2-4993-818e-2309c3f5ba21","value":"Weighted hotspot sample description (Fitnesse)"}]}},"analysisTabDate":{"type":"absolute","onlyOn":{"type":"any"},"relative":{"offset":-1,"unit":"months"},"absolute":{"start":{"after":{"date":"2018-04-01","time":"T00:00:00","dateTime":"2018-04-01T00:00:00-00:00"},"before":{"date":"2019-04-01","time":"T23:59:59","dateTime":"2019-04-01T23:59:59-00:00"}},"end":{"after":{"date":null,"time":null,"dateTime":null},"before":{"date":null,"time":null,"dateTime":null}}}},"analysisTabArea":{"namedAreaIdList":[{"areaId":$ACENTRAL,"areaDatasourceId":$DSID_RRAREAS},{"areaId":$AWEST,"areaDatasourceId":$DSID_RRAREAS},{"areaId":$ANORTH,"areaDatasourceId":$DSID_RRAREAS}]},"analysisTabData":{"query":{"$DSID_RRPOLINC":[{"ignoreDateTime":false}]}},"hotspotAnalysisTabData":{"hotspotType":1,"temporalDistance":1,"spatialDistance":200,"distanceUnits":1,"visualizationCode":1,"minPointsInCluster":2},"analysisTabWeight":{"layers":[{"name":{"key":"roundRockPoliceIncidents","group":"Sample","i18nLabel":"Police Incidents"},"attributes":[{"markSelected":false,"ranges":[{"weight":1,"id":0,"operation":"equals","value":"THEFT"},{"weight":2,"id":1,"operation":"equals","value":"ARSON"},{"weight":3,"id":2,"operation":"equals","value":"BURGB"},{"weight":10,"id":3,"operation":"equals","value":"BOMB"},{"weight":5,"id":4,"operation":"equals","value":"ASLT1"},{"weight":1,"id":5,"operation":"equals","value":"WT"},{"weight":4,"id":6,"operation":"equals","value":"BURGD"}],"timeframeUnits":"days","displayName":{"group":"DataSourceI18n","key":"i18n_c02deea2-f5d1-4e1a-b551-b959121aa2d9","i18nLabel":"offense"},"name":"5","id":"offense","type":"VARCHAR","operation":"EQUALS","selected":true},{"markSelected":false,"ranges":[],"displayName":{"group":"DataSourceI18n","key":"i18n_41fed7fd-48e8-44b0-b1fd-3301f92bde76","i18nLabel":"address"},"name":"6","id":"address","type":"VARCHAR","selected":false},{"ranges":[],"displayName":{"group":"DataSourceI18n","key":"i18n_c345f5c9-2799-4733-a433-137535037e4a","i18nLabel":"ARREST"},"name":"8","id":"ARREST","type":"VARCHAR","selected":false},{"ranges":[],"displayName":{"group":"DataSourceI18n","key":"i18n_e94b4e68-cd0a-45d7-87b9-32694f058c62","i18nLabel":"OFFENSE_CODE"},"name":"9","id":"OFFENSE_CODE","type":"VARCHAR","selected":false}],"id":$DSID_RRPOLINC,"type":"CSV"}]},"analysisTabGrouping":[{"id":$DSID_RRPOLINC,"name":"Police Incidents","group":"address"}],"analysisTabAlerting":{"notification":"true","gridData":[{"name":"sysadmin","type":"User","notify":1}]},"analysisTabScheduling":[{"id":$WHOTSPOTID,"viewId":$WHOTSPOTID,"scheduledToRun":true,"schedulerType":"interval","frequency":"daily","repeatInterval":86400000,"time":"T00:00:00","start":1556233200000,"timezone":"Europe/London"}],"analysisTabLegend":{"opacityList":["0.1","0.2","0.3","0.4","0.5","0.6","0.7","0.8","0.9","1.0"],"legendMode":"bad","colorList":[{"label":"{\"group\":\"Analytic\",\"key\":\"cbf63f42-0590-40b7-aef9-392b4083593c\"}","value":20,"alert":false,"color":"#000000","status":"messaging_status_hotspot_trivial","severity":1},{"label":"{\"group\":\"Analytic\",\"key\":\"91f06086-387d-40ba-8b55-af128a2746ec\"}","value":40,"alert":false,"color":"#008000","status":"messaging_status_hotspot_low","severity":2},{"label":"{\"group\":\"Analytic\",\"key\":\"973a9c1e-ab26-4295-89f4-7d66a579dd88\"}","value":60,"alert":true,"color":"#ffd700","status":"messaging_status_hotspot_moderate","severity":3},{"label":"{\"group\":\"Analytic\",\"key\":\"9389e7b4-bd02-4287-84f0-a6d09179a5dd\"}","value":80,"alert":true,"color":"#8b008b","status":"messaging_status_hotspot_important","severity":4},{"label":"{\"group\":\"Analytic\",\"key\":\"2c8451dc-4575-470d-a5e5-7f9b1b55538a\"}","value":100,"alert":true,"color":"#ff0000","status":"messaging_status_hotspot_critical","severity":5}],"timeInterval":"Weekly","opacity":0.5,"columns":["Name","EndValue","Alert","Color"],"endValueType":""}},"runOnSave":false} | | 200 | =~/(?i)"i18nLabel":"Weighted Hotspot Sample \(Fitnesse\)"/ | | 1 | |
+
+'''Verify the target table was cleared'''
+
+| generic database fixture |
+| connectionName | statementType | statementText | responseFormat | getResponse? | getResultCount? | getResponseMessage? | getFirstResultField? |
+| iocdata | read | select count(objectid) as ocnt from ioc.target_table_weightedhotspot_$WHOTSPOTID | json | | 1 | OK | 0 |
+
+'''Delete Analytic'''
+
+| generic service validator fixture |
+| # comment | requestType | serviceName | requestBody | customHeaders | getResponseCode? | getResponseMessage? | getResponseId? | getResultCount? | getUrl? |
+| Delete weighted hotspot | DELETE | /analytic-service/config/$WHOTSPOTID | | | 200 | | |  | |

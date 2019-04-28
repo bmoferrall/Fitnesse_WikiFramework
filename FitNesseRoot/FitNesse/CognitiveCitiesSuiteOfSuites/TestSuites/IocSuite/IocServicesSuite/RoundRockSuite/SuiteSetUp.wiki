@@ -1,0 +1,34 @@
+---
+Test
+---
+<test page>
+
+!define TEST_SYSTEM {slim}
+!path   ./CognitiveCitiesTesting.jar
+'''Include main Suite Set Up page'''
+
+!include <IocServicesSuite.SuiteSetUp
+'''Include Variable Definitions'''
+
+!include <IocServicesSuite.SetUpVariables
+'''Include Datasource Set Up'''
+
+!include <IocSuite.IocHelperSuite.RoundRockHelperSuite.RrAreasDatasourceSetUp
+
+!include <IocSuite.IocHelperSuite.RoundRockHelperSuite.RrLiquourPermitsDatasourceSetUp
+
+!include <IocSuite.IocHelperSuite.RoundRockHelperSuite.Rr311CallsDatasourceSetUp
+
+!include <IocSuite.IocHelperSuite.RoundRockHelperSuite.Rr911CallsDatasourceSetUp
+
+!include <IocSuite.IocHelperSuite.RoundRockHelperSuite.RrBusStopsDatasourceSetUp
+
+!include <IocSuite.IocHelperSuite.RoundRockHelperSuite.RrBusinessLicensesDatasourceSetUp
+
+!include <IocSuite.IocHelperSuite.RoundRockHelperSuite.RrLiquourSellersDatasourceSetUp
+
+!include <IocSuite.IocHelperSuite.RoundRockHelperSuite.RrPoliceIncidentsDatasourceSetUp
+
+!include <IocSuite.IocHelperSuite.RoundRockHelperSuite.RrTempLiquourPermitsDatasourceSetUp
+
+!include <IocSuite.IocHelperSuite.RoundRockHelperSuite.RoundRockFilterPanelSetUp

@@ -1,0 +1,101 @@
+---
+Help: Create, use and delete anomaly by day analytic using Round Rock Police Incidents data
+---
+<test page>
+
+!define TEST_SYSTEM {slim}
+!path   ./CognitiveCitiesTesting.jar
+
+'''Get anomaly type id'''
+
+| generic service validator fixture |
+| # comment | requestType | serviceName | requestBody | customHeaders | getResponseCode? | getResponseMessage? | getResponseId? | getResponseMap? | getResultCount? | getUrl? |
+| Get type id for anomaly analytic | GET | /analytic-service/types/8/?page=ioc.Operations&solution=IOC | | | 200 | =~/(?i)"name":"Anomaly"/ | | $MANOMALY= | 1 | |
+
+'''A few service calls before creating the anomaly analytic'''
+
+| generic service validator fixture |
+| # comment | requestType | serviceName | requestBody | customHeaders | getResponseCode? | getResponseMessage? | getResponseId? | getResultCount? | getUrl? |
+| Config service | GET | /analytic-service/config/?visibility=%7B%22scope%22%3A%5B%22public%22%2C%22private%22%5D%2C%22groups%22%3A%5B%5D%7D&criterion=deleteflag%3D0&criterion=deleteflag | | | 200 | =~/(?i)"type":"FeatureCollection"/ | | 1 | |
+| Instant Config service | GET | /analytic-service/config/instant/?visibility=%7B%22scope%22%3A%5B%22public%22%2C%22private%22%5D%2C%22groups%22%3A%5B%5D%7D&criterion=deleteflag%3D0&criterion=deleteflag%3D0&instant=true | | | 200 | =~/(?i)"type":"FeatureCollection"/ | | 1 | |
+| Tree model service | GET | /analytic-service/result/treeModel/?visibility=%7B%22scope%22%3A%5B%22private%22%2C%22public%22%2C%22groups%22%5D%2C%22groups%22%3A%5B%5D%7D&criterion=deleteflag%3D0&criterion=deleteflag | | | 200 | =~/(?i)"type":"FeatureCollection"/ | | 1 | |
+| Tabs service | GET | /analytic-service/config/tabs/ | | | 200 | =~/(?i)"tabId":"analysisTabAnomalyAnalytic"/ | | >=68 | |
+| Types service | GET | /analytic-service/types/?page=ioc.Operations&solution=IOC | | | 200 | =~/(?i)"name":"Anomaly"/ | | >=8 | |
+
+'''Save the value of objectid for each area'''
+
+| generic database fixture |
+| connectionName | statementType | statementText | responseFormat | getResponse? | getResultCount? | getResponseMessage? | getFirstResultField? |
+| iocdata | read | select objectid from ioc.target_table_${TT_NAME_RR_AREAS} where name='Central' | json | | 1 | OK | $ACENTRAL= |
+| iocdata | read | select objectid from ioc.target_table_${TT_NAME_RR_AREAS} where name='North' | json | | 1 | OK | $ANORTH= |
+| iocdata | read | select objectid from ioc.target_table_${TT_NAME_RR_AREAS} where name='West' | json | | 1 | OK | $AWEST= |
+
+'''Create and test the anomaly analytic'''
+
+| generic service validator fixture |
+| # comment | requestType | serviceName | requestBody | customHeaders | getResponseCode? | getResponseMessage? | getResponseId? | getResultCount? | getUrl? |
+| Create anomaly | POST | /analytic-service/config | {"id":-1,"name":{"group":"Analytic","key":"i18n_24ad736e-2055-4c31-8fda-ceb653493259","resources":[{"group":"Analytic","locale":"en","key":"i18n_24ad736e-2055-4c31-8fda-ceb653493259","value":"Anomaly Sample (Fitnesse)"}]},"description":{"group":"Analytic","key":"i18n_10f4f80b-d73e-4638-8d55-8ff59e1c3ae8","resources":[{"group":"Analytic","locale":"en","key":"i18n_10f4f80b-d73e-4638-8d55-8ff59e1c3ae8","value":"Anomaly sample description (Fitnesse)"}]},"analysisType":$`MANOMALY.analyticType`,"draft":false,"tabs":{"analysisTabGeneral":{"name":{"group":"Analytic","key":"i18n_24ad736e-2055-4c31-8fda-ceb653493259","resources":[{"group":"Analytic","locale":"en","key":"i18n_24ad736e-2055-4c31-8fda-ceb653493259","value":"Anomaly Sample (Fitnesse)"}]},"description":{"group":"Analytic","key":"i18n_10f4f80b-d73e-4638-8d55-8ff59e1c3ae8","resources":[{"group":"Analytic","locale":"en","key":"i18n_10f4f80b-d73e-4638-8d55-8ff59e1c3ae8","value":"Anomaly sample description (Fitnesse)"}]}},"analysisTabDate":{"type":"absolute","onlyOn":{"type":"any"},"relative":{"offset":-1,"unit":"months"},"absolute":{"start":{"after":{"date":"2018-07-01","time":"T00:00:00","dateTime":"2018-07-01T00:00:00-00:00"},"before":{"date":"2018-08-08","time":"T00:00:00","dateTime":"2018-08-08T00:00:00-00:00"}},"end":{"after":{"date":null,"time":null,"dateTime":null},"before":{"date":null,"time":null,"dateTime":null}}}},"analysisTabArea":{"namedAreaIdList":[{"areaId":$ACENTRAL,"areaDatasourceId":$DSID_RRAREAS},{"areaId":$AWEST,"areaDatasourceId":$DSID_RRAREAS},{"areaId":$ANORTH,"areaDatasourceId":$DSID_RRAREAS}]},"analysisTabData":{"query":{"$DSID_RRPOLINC":[{"ignoreDateTime":false}]}},"analysisTabAnomalyAnalytic":{"analysisAnomalyType":"AnomalyByDay","trainingStartDate":1514764800000,"trainingEndDate":1546214400000},"analysisTabAlerting":{"notification":"true","gridData":[{"name":"sysadmin","type":"User","notify":1}]},"analysisTabScheduling":[{"id":-1,"viewId":-1,"scheduledToRun":false,"schedulerType":"interval","frequency":"daily","repeatInterval":86400000,"time":"T00:00:00","start":1556146800000,"timezone":"Europe/London"}],"analysisTabLegend":{"legendMode":"bad","colorList":[{"label":"{\"group\":\"Analytic\",\"key\":\"ca4600cb-05bf-4635-b472-3c9c69bb6012\"}","value":-2,"alert":true,"color":"#008abf","status":"messaging_status_hotspot_trivial","severity":1},{"label":"{\"group\":\"Analytic\",\"key\":\"17e733f3-5ab0-499c-85d4-563c49f364d7\"}","value":0,"alert":false,"color":"#8cc63f","status":"messaging_status_hotspot_low","severity":2},{"label":"{\"group\":\"Analytic\",\"key\":\"b8981970-9eb7-413f-9faa-e7f63a524146\"}","value":2,"alert":true,"color":"#f04e37","status":"messaging_status_hotspot_moderate","severity":3}],"timeInterval":"Monthly","opacity":0.3,"columns":["Name","Alert","Color"],"endValueType":""}},"runOnSave":false} | | 200 | =~/(?i)"i18nLabel":"Anomaly Sample \(Fitnesse\)"/ | $ANOMALYID= | 1 | |
+| Tree model service | GET | /analytic-service/result/treeModel/?visibility=%7B%22scope%22%3A%5B%22private%22%2C%22public%22%2C%22groups%22%5D%2C%22groups%22%3A%5B%5D%7D&criterion=deleteflag | | | 200 | =~/(?i)"areaName":"_all_"/ | | 1 | |
+| Config service | GET | /analytic-service/config/?visibility=%7B%22scope%22%3A%5B%22public%22%2C%22private%22%5D%2C%22groups%22%3A%5B%5D%7D&criterion=deleteflag%3D0&criterion=deleteflag | | | 200 | =~/(?i)"i18nLabel":"Anomaly Sample \(Fitnesse\)"/ | | 1 | |
+
+'''Get the datasource id of the anomaly from the 'datasourceId' field'''
+
+| generic database fixture |
+| connectionName | statementType | statementText | responseFormat | getResponse? | getResultCount? | getResponseMessage? | getFirstResultField? |
+| iocdb | read | select id from ioc.datasource_sources where upper(name)='ANOMALY_$ANOMALYID' | json | | 1 | OK | $DSID_ANOMALY= |
+
+'''Run the analysis'''
+
+| generic service validator fixture |
+| # comment | requestType | serviceName | requestBody | customHeaders | getResponseCode? | getResponseMessage? | getResponseId? | getResultCount? | getUrl? |
+| Run analysis | POST | /analytic-service/config/$ANOMALYID/run | | | 200 | | | | |
+
+'''Pause for analysis to run'''
+
+| script |
+| #''Wait 2.5 minutes for analysis to complete'' |
+| time delay ; | 150000 |
+
+'''Run some data verifications on the target table'''
+
+| generic database fixture |
+| connectionName | statementType | statementText | responseFormat | getResponse? | getResultCount? | getResponseMessage? | getFirstResultField? |
+| iocdata | read | select count(objectid) as ocnt from ioc.target_table_anomaly_$ANOMALYID | json |  | 1 | OK | 114 |
+| iocdata | read | select max(count) as maxcount from ioc.target_table_anomaly_$ANOMALYID | json | | 1 | OK | 22 |
+| iocdata | read | select count(objectid) as ocnt from ioc.target_table_anomaly_$ANOMALYID where int(anomaly)=1 | json | | 1 | OK | 0 |
+| iocdata | read | select min(mean) as minmean from ioc.target_table_anomaly_$ANOMALYID | json | | 1 | OK | 2.4 < _ < 2.6 |
+| iocdata | read | select max(mean) as maxmean from ioc.target_table_anomaly_$ANOMALYID | json | | 1 | OK | 11.0 < _ < 13.0 |
+| iocdata | read | select min(sdev) as minsdev from ioc.target_table_anomaly_$ANOMALYID | json | | 1 | OK | 0.9 < _ < 1.1 |
+| iocdata | read | select max(sdev) as maxsdev from ioc.target_table_anomaly_$ANOMALYID | json | | 1 | OK | 7.3 < _ < 7.5 |
+| iocdata | read | select min(lowerbound) as minlb from ioc.target_table_anomaly_$ANOMALYID | json | | 1 | OK | -7.0 < _ < -6.0 |
+| iocdata | read | select max(lowerbound) as maxlb from ioc.target_table_anomaly_$ANOMALYID | json | | 1 | OK | 5.0 < _ < 5.2 |
+| iocdata | read | select min(upperbound) as minub from ioc.target_table_anomaly_$ANOMALYID | json | | 1 | OK | 4.4 < _ < 4.6 |
+| iocdata | read | select max(upperbound) as maxub from ioc.target_table_anomaly_$ANOMALYID | json | | 1 | OK | 25.0 < _ < 26.0 |
+
+'''Result Interval Services'''
+
+| generic service validator fixture |
+| # comment | requestType | serviceName | requestBody | customHeaders | getResponseCode? | getResponseMessage? | getResponseId? | getResultCount? | getUrl? |
+| Get named area details | GET | /spatial-service/namedareas/$DSID_RRAREAS/?namedAreas=$ACENTRAL | | | 200 | =~/(?i)"id":$ACENTRAL/ | | 1 | |
+| Get result intervals for central area | GET | /analytic-service/result/interval/$ANOMALYID?areaDatasourceId=$DSID_RRAREAS&areaId=$ACENTRAL | | | 200 | =~/(?i)"i18nLabel":"Anomaly Sample \(Fitnesse\)"/ | | 1 | |
+| Get first result | GET | /analytic-service/result/$`MANOMALY.analyticType`/$DSID_ANOMALY/?criterion=startDateTime%3E%3D2018-07-01T00%3A00%3A00%2B01%3A00&criterion=startDateTime%3C2018-08-01T00%3A00%3A00%2B01%3A00&criterion=deleteflag%3D0&areas=%5B%7B%22wkt%22%3Anull%2C%22areaId%22%3A$ACENTRAL%2C%22areaDatasourceId%22%3A$DSID_RRAREAS%2C%22key%22%3A%22$ACENTRAL-$DSID_RRAREAS%22%7D%5D | | | 200 | =~/(?i)"areaDatasourceId":$DSID_RRAREAS/ | | 1 | |
+| Get last result | GET | /analytic-service/result/$`MANOMALY.analyticType`/$DSID_ANOMALY/?criterion=startDateTime%3E%3D2018-08-01T00%3A00%3A00%2B01%3A00&criterion=startDateTime%3C2018-08-08T00%3A00%3A00%2B01%3A00&criterion=deleteflag%3D0&areas=%5B%7B%22wkt%22%3Anull%2C%22areaId%22%3A$ACENTRAL%2C%22areaDatasourceId%22%3A$DSID_RRAREAS%2C%22key%22%3A%22$ACENTRAL-$DSID_RRAREAS%22%7D%5D | | | 200 | =~/(?i)"areaDatasourceId":$DSID_RRAREAS/ | | 1 | |
+
+'''Update Analytic'''
+
+| generic service validator fixture |
+| # comment | requestType | serviceName | requestBody | customHeaders | getResponseCode? | getResponseMessage? | getResponseId? | getResultCount? | getUrl? |
+| Update anomaly | PUT | /analytic-service/config | {"id":$ANOMALYID,"name":{"group":"Analytic","key":"i18n_24ad736e-2055-4c31-8fda-ceb653493259","resources":[{"group":"Analytic","locale":"en","key":"i18n_24ad736e-2055-4c31-8fda-ceb653493259","value":"Anomaly Sample (Fitnesse)"}]},"description":{"group":"Analytic","key":"i18n_10f4f80b-d73e-4638-8d55-8ff59e1c3ae8","resources":[{"group":"Analytic","locale":"en","key":"i18n_10f4f80b-d73e-4638-8d55-8ff59e1c3ae8","value":"Anomaly sample description (Fitnesse)"}]},"analysisType":$`MANOMALY.analyticType`,"draft":false,"tabs":{"analysisTabGeneral":{"name":{"group":"Analytic","key":"i18n_24ad736e-2055-4c31-8fda-ceb653493259","resources":[{"group":"Analytic","locale":"en","key":"i18n_24ad736e-2055-4c31-8fda-ceb653493259","value":"Anomaly Sample (Fitnesse)"}]},"description":{"group":"Analytic","key":"i18n_10f4f80b-d73e-4638-8d55-8ff59e1c3ae8","resources":[{"group":"Analytic","locale":"en","key":"i18n_10f4f80b-d73e-4638-8d55-8ff59e1c3ae8","value":"Anomaly sample description (Fitnesse)"}]}},"analysisTabDate":{"type":"absolute","onlyOn":{"type":"any"},"relative":{"offset":-1,"unit":"months"},"absolute":{"start":{"after":{"date":"2018-07-01","time":"T00:00:00","dateTime":"2018-07-01T00:00:00-00:00"},"before":{"date":"2018-08-08","time":"T00:00:00","dateTime":"2018-08-08T00:00:00-00:00"}},"end":{"after":{"date":null,"time":null,"dateTime":null},"before":{"date":null,"time":null,"dateTime":null}}}},"analysisTabArea":{"namedAreaIdList":[{"areaId":$ACENTRAL,"areaDatasourceId":$DSID_RRAREAS},{"areaId":$AWEST,"areaDatasourceId":$DSID_RRAREAS},{"areaId":$ANORTH,"areaDatasourceId":$DSID_RRAREAS}]},"analysisTabData":{"query":{"$DSID_RRPOLINC":[{"ignoreDateTime":false}]}},"analysisTabAnomalyAnalytic":{"analysisAnomalyType":"AnomalyByDay","trainingStartDate":1514764800000,"trainingEndDate":1546214400000},"analysisTabAlerting":{"notification":"true","gridData":[{"name":"sysadmin","type":"User","notify":1}]},"analysisTabScheduling":[{"id":-1,"viewId":-1,"scheduledToRun":true,"schedulerType":"interval","frequency":"daily","repeatInterval":86400000,"time":"T00:00:00","start":1556146800000,"timezone":"Europe/London"}],"analysisTabLegend":{"legendMode":"bad","colorList":[{"label":"{\"group\":\"Analytic\",\"key\":\"ca4600cb-05bf-4635-b472-3c9c69bb6012\"}","value":-2,"alert":true,"color":"#008abf","status":"messaging_status_hotspot_trivial","severity":1},{"label":"{\"group\":\"Analytic\",\"key\":\"17e733f3-5ab0-499c-85d4-563c49f364d7\"}","value":0,"alert":false,"color":"#8cc63f","status":"messaging_status_hotspot_low","severity":2},{"label":"{\"group\":\"Analytic\",\"key\":\"b8981970-9eb7-413f-9faa-e7f63a524146\"}","value":2,"alert":true,"color":"#f04e37","status":"messaging_status_hotspot_moderate","severity":3}],"timeInterval":"Monthly","opacity":0.3,"columns":["Name","Alert","Color"],"endValueType":""}},"runOnSave":false} | | 200 | =~/(?i)"i18nLabel":"Anomaly Sample \(Fitnesse\)"/ | | 1 | |
+
+
+'''Verify the target table was cleared'''
+
+| generic database fixture |
+| connectionName | statementType | statementText | responseFormat | getResponse? | getResultCount? | getResponseMessage? | getFirstResultField? |
+| iocdata | read | select count(objectid) as ocnt from ioc.target_table_anomaly_$ANOMALYID | json | | 1 | OK | 0 |
+
+'''Delete Analytic'''
+
+| generic service validator fixture |
+| # comment | requestType | serviceName | requestBody | customHeaders | getResponseCode? | getResponseMessage? | getResponseId? | getResultCount? | getUrl? |
+| Delete anomaly | DELETE | /analytic-service/config/$ANOMALYID | | | 200 | | | | |

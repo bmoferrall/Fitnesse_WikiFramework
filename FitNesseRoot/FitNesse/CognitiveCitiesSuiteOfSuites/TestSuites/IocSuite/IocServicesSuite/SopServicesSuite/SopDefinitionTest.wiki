@@ -1,0 +1,18 @@
+<test page>
+!define TEST_SYSTEM {slim}
+!path   ./CognitiveCitiesTesting.jar
+
+'''Configure alternative ID name for SOP definitions'''
+
+!|ModelSetUp                |
+|idName|
+|uid|
+
+'''SOP Definition Tests'''
+
+|script                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+|#''Create new SOP definition in two steps. First step returns the id 'uid' of the new definition''|
+
+'''Restore defaults'''
+
+!|ModelTearDown                |

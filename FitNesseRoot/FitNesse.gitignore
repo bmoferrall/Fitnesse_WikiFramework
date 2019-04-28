@@ -1,0 +1,10 @@
+*.zip
+files/
+FitNesse/ComponentsAndLicenses/
+FitNesse/FullReferenceGuide/
+FitNesse/ReleaseNotes/
+FitNesse/SuiteAcceptanceTests/
+FitNesse/SuiteFitAcceptanceTests/
+FitNesse/UserGuide/
+TemplateLibrary/
+RecentChanges.wiki

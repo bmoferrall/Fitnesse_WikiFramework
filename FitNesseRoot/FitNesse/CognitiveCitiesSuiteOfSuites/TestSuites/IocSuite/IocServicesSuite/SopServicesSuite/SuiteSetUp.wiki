@@ -1,0 +1,25 @@
+---
+Help: Create SOP definition and datasource
+Test
+---
+<test page>
+
+!define TEST_SYSTEM {slim}
+!path   ./CognitiveCitiesTesting.jar
+
+'''Include main Suite Set Up page'''
+
+!include <IocServicesSuite.SuiteSetUp
+
+'''Include Variable Definitions'''
+
+!include <IocServicesSuite.SetUpVariables
+
+'''Include SOP Definition Set Up'''
+
+!include <IocSuite.IocHelperSuite.SopDefinitionSetUp
+
+'''Include SOP Datasource Set Up'''
+
+!include <IocSuite.IocHelperSuite.SopDatasourceSetUp
+

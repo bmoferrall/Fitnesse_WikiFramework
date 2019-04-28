@@ -1,0 +1,18 @@
+---
+Help: Delete Round Rock Filter Panels
+Test
+---
+<test page>
+
+!define TEST_SYSTEM {slim}
+!path   ./CognitiveCitiesTesting.jar
+
+'''DELETE FILTERS'''
+
+|generic service validator fixture                                                                                                                                                  |
+|requestType|serviceName                                                                                               |requestBody|customHeaders|getResponseCode?|getResponseMessage?|getResponseId?|getResultCount?|getUrl?|
+|DELETE     |/filter-service/panels/$FID_PUBLICSAFETY|||204             ||||       |
+|DELETE     |/filter-service/panels/$FID_LICPERMIT|||204             ||||       |
+|DELETE     |/filter-service/panels/$FID_PLACES|||204             ||||       |
+
+
