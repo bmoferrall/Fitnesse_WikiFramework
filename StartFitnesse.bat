@@ -1,0 +1,1 @@
+java -Xmx1024M -jar fitnesse-standalone.jar -p 9090 -e 1
