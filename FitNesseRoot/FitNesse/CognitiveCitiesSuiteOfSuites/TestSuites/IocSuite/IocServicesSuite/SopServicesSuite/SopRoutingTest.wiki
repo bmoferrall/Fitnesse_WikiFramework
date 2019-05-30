@@ -2,13 +2,17 @@
 
 !define TEST_SYSTEM {slim}
 !path   ./CognitiveCitiesTesting.jar
+
 '''Include Variables Definitions'''
 
 !include <IocServicesSuite.SetUpVariables
+
 '''Copy CSV with update to record number 1. Note that the ID column is a 'used as id' column in this datasource'''
 
 | script |
-| remote file copy; | ./testfiles/sop_delta.csv | /opt/IBM/ioc/csv/soptest.csv | ${APPSERVER} | ${APPSERVERUSER} | ${APPSERVERKEYFILE} | ${APPSERVERKEYPWD} |
+| remote file copy; | ./testfiles/sop_delta.csv | /opt/IBM/ioc/csv/soptest.csv | ${APPSERVER} | ${SSHUSER} | ${PRIVATEKEYFILE} | ${PRIVATEKEYPWD} |
+
+'''Pause to allow the IOC data receiver to pick up the new file'''
 
 | script |
 | #''Wait at least 1 minute for IOC to ingest the new file (polling time is 1 minute)'' |

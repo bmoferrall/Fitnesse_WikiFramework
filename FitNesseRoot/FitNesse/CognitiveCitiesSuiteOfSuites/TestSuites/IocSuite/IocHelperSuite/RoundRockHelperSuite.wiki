@@ -1,4 +1,5 @@
 ---
-Suite: no
+Help: Suite of reusable Round Rock test fragments
 ---
+!1 Round Rock Helper Suite
 !contents -R2 -g -p -f -h

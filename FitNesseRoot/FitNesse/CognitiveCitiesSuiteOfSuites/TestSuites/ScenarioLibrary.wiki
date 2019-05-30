@@ -86,6 +86,26 @@ Test
 |check        |time util response message|OK                                                           |
 |show |time util response |
 
+|scenario          | current time plus days _ _|numberOfDays,format|
+|$CURRENTTIMEPLUSDAYS=|add days to current time;|@numberOfDays|@format|
+|check        |time util response message|OK                                                           |
+|show |time util response |
+
+|scenario          | current time plus hours _ _|numberOfHours,format|
+|$CURRENTTIMEPLUSHOURS=|add hours to current time;|@numberOfHours|@format|
+|check        |time util response message|OK                                                           |
+|show |time util response |
+
+|scenario          | current time minus days _ _|numberOfDays,format|
+|$CURRENTTIMEMINUSDAYS=|subtract days from current time;|@numberOfDays|@format|
+|check        |time util response message|OK                                                           |
+|show |time util response |
+
+|scenario          | current time minus hours _ _|numberOfHours,format|
+|$CURRENTTIMEMINUSHOURS=|subtract hours from current time;|@numberOfHours|@format|
+|check        |time util response message|OK                                                           |
+|show |time util response |
+
 |library           |
 |file scenarios|
 
@@ -106,5 +126,15 @@ Test
 
 |scenario     |file search replace _ _ _ _  |sourceFile,searchReplacePairs,separator,pairSeparator|
 |replace strings in file;|@sourceFile          |@searchReplacePairs |@separator|@pairSeparator         |
+|check        |file util response message|OK                                                           |
+|show         |file util response                                                                      |
+
+|scenario     |string search replace _ _ _ _  |sourceString,searchReplacePairs,separator,pairSeparator|
+|replace tokens in string;|@sourceString          |@searchReplacePairs |@separator|@pairSeparator         |
+|check        |file util response message|OK                                                           |
+|$NEWSTRING=         |file util response                                                                      |
+
+|scenario     |remote command execution _ _ _ _ _ |command,host,user,keyPath,keyPassword|
+|execute remote command;|@command   |@host|@user|@keyPath|@keyPassword          |
 |check        |file util response message|OK                                                           |
 |show         |file util response                                                                      |

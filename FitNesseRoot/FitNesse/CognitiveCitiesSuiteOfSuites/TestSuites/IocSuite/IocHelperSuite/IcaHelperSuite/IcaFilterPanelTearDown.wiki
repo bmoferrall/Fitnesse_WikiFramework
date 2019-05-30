@@ -1,0 +1,16 @@
+---
+Help: Delete ICA Filter Panels
+Test
+---
+<test page>
+
+!define TEST_SYSTEM {slim}
+!path   ./CognitiveCitiesTesting.jar
+
+'''DELETE FILTERS'''
+
+| generic service validator fixture |
+| requestType | serviceName | requestBody | customHeaders | getResponseCode? | getResponseMessage? | getResponseId? | getResultCount? | getUrl? |
+| DELETE | /filter-service/panels/$FID_ICACRIME | | | 204 | | | | |
+| DELETE | /filter-service/panels/$FID_ICAPOI | | | 204 | | | | |
+| DELETE | /filter-service/panels/$FID_ICAAREAS | | | 204 | | | | |

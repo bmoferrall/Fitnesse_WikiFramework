@@ -1,0 +1,48 @@
+---
+Help: Clean up after ICA tests
+Test
+---
+<test page>
+
+!define TEST_SYSTEM {slim}
+!path   ./CognitiveCitiesTesting.jar
+
+'''Include Variable Definitions'''
+
+!include <IocServicesSuite.SetUpVariables
+
+'''Include Datasource, Map, and Filter Tear Down'''
+
+!include <IocSuite.IocHelperSuite.IcaHelperSuite.IcaFilterPanelTearDown
+
+!include <IocSuite.IocHelperSuite.IcaHelperSuite.IcaGeoMapTearDown
+
+!include <IocSuite.IocHelperSuite.IcaHelperSuite.IcaZonesDatasourceTearDown
+
+!include <IocSuite.IocHelperSuite.IcaHelperSuite.IcaDistrictsDatasourceTearDown
+
+!include <IocSuite.IocHelperSuite.IcaHelperSuite.IcaReportingAreasDatasourceTearDown
+
+!include <IocSuite.IocHelperSuite.IcaHelperSuite.IcaAdultArrestsDatasourceTearDown
+
+!include <IocSuite.IocHelperSuite.IcaHelperSuite.IcaJuvenileArrestsDatasourceTearDown
+
+!include <IocSuite.IocHelperSuite.IcaHelperSuite.IcaAdultDatasourceTearDown
+
+!include <IocSuite.IocHelperSuite.IcaHelperSuite.IcaJuvenileDatasourceTearDown
+
+!include <IocSuite.IocHelperSuite.IcaHelperSuite.IcaWeatherDatasourceTearDown
+
+!include <IocSuite.IocHelperSuite.IcaHelperSuite.IcaTargetedCrimeDatasourceTearDown
+
+!include <IocSuite.IocHelperSuite.IcaHelperSuite.IcaAllCrimeDatasourceTearDown
+
+!include <IocSuite.IocHelperSuite.IcaHelperSuite.IcaDatabaseTearDown
+
+!include <IocSuite.IocHelperSuite.ResourceKeyCleanUp
+
+!include <IocSuite.IocHelperSuite.IcaHelperSuite.IcaSystemPropertiesTearDown
+
+'''Include main Suite TearDown page'''
+
+!include <IocServicesSuite.SuiteTearDown

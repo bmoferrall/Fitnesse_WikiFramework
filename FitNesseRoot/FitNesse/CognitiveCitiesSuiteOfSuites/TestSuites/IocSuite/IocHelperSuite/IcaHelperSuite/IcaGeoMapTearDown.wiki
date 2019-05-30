@@ -1,0 +1,15 @@
+---
+Help: Delete ICA Map Settings
+Test
+---
+<test page>
+
+!define TEST_SYSTEM {slim}
+!path   ./CognitiveCitiesTesting.jar
+
+'''DELETE ICA MAP SETTINGS'''
+
+| generic service validator fixture |
+| requestType | serviceName | requestBody | customHeaders | getResponseCode? | getResponseMessage? | getResponseId? | getResultCount? | getUrl? |
+| DELETE | /mapsettings-service/mapdefinitions/$ICA_MAPSETTINGSID | | | 204 |  | | | |
+

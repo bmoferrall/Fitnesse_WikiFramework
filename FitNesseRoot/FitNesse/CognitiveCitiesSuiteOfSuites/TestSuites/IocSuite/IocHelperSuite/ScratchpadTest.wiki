@@ -1,0 +1,29 @@
+---
+Help: Use to test different combinations of actions without any Suite Set up and Tear down scripts being called
+---
+<test page>
+
+!define TEST_SYSTEM {slim}
+!path   ./CognitiveCitiesTesting.jar
+
+!include <IocSuite.IocServicesSuite.SuiteSetUp
+
+| script |
+| current time plus days; | 5 | |
+| current time plus days; | 7 | yyyy-MM-dd |
+
+| script |
+| current time plus hours; | 5 | |
+| current time plus hours; | 7 | HH-mm-ss |
+
+| script |
+| current time minus days; | 5 | |
+| current time minus days; | 8 | yyyy-MM-dd |
+
+| script |
+| current time minus hours; | 5 | |
+| current time minus hours; | 7 | HH-mm-ss |
+
+| script |
+| string search replace; | foo, hello | foo:bar;hello:world | :| ;|
+

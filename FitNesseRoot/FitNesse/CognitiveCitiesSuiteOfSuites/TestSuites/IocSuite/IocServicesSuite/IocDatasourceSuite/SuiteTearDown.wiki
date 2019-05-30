@@ -13,6 +13,8 @@ Test
 
 !include <IocSuite.IocHelperSuite.CsvDatasourceTearDown
 
+!include <IocSuite.IocHelperSuite.ResourceKeyCleanUp
+
 !include <IocServicesSuite.SuiteTearDown
 
 

@@ -13,8 +13,9 @@
 |Test with out-of-range start date filter|GET        |/spatial-service/features/$DSID_CSV?criterion=Property_ID%3D2&criterion=startDateTime%3C%3D2019-01-01T00%3A00%3A00-00%3A00 |||200             |=~/(?i)"features":\[\]/||1||
 
 '''Copy CSV with update to record number 1. Note that the ID column is a 'used as id' column in this datasource'''
+
 |script                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
-|remote file copy;|./testfiles/datasource_delta.csv|/opt/IBM/ioc/csv/names.csv|${APPSERVER}|${APPSERVERUSER}|${APPSERVERKEYFILE}|${APPSERVERKEYPWD}|
+|remote file copy;|./testfiles/datasource_delta.csv|/opt/IBM/ioc/csv/names.csv|${APPSERVER}|${SSHUSER}|${PRIVATEKEYFILE}|${PRIVATEKEYPWD}|
 
 |script                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
 |#''Wait at least 1 minute for IOC to ingest the new file (polling time is 1 minute)''|

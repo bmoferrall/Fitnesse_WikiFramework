@@ -1,0 +1,65 @@
+---
+Help: Restore system properties changed during crime model set up
+Test
+---
+<test page>
+
+!define TEST_SYSTEM {slim}
+!path   ./CognitiveCitiesTesting.jar
+
+'''Include Variable Definitions'''
+
+!include <IocSuite.IocServicesSuite.SetUpVariables
+
+'''Restore values of key system properties'''
+
+'''Strip leading and trailing square brackets (saved response is an array)'''
+
+| script |
+| string search replace; | $SAVEDPOPALLCRIMESYSPROP | [{":{";false}]:false} | : | ; |
+
+| generic service validator fixture |
+| requestType | serviceName | requestBody | customHeaders | getResponseCode? | getResponseMessage? | getResponseId? | getResultCount? | getUrl? |
+| GET | /sysprop-service/sysprops/?name=POPAllCrimeDataSource | | | 200 |  | $POPALLCRIMESYSPROPID=| 1 | |
+| PUT | /sysprop-service/sysprops/$POPALLCRIMESYSPROPID?forceUpdate=true | $NEWSTRING | | 200 |  | | 1 | |
+
+| script |
+| string search replace; | $SAVEDPOPARRESTSYSPROP | [{":{";false}]:false} | : | ; |
+
+| generic service validator fixture |
+| requestType | serviceName | requestBody | customHeaders | getResponseCode? | getResponseMessage? | getResponseId? | getResultCount? | getUrl? |
+| GET | /sysprop-service/sysprops/?name=POPArrestDataSources | | | 200 |  | $POPARRESTSYSPROPID=| 1 | |
+| PUT | /sysprop-service/sysprops/$POPARRESTSYSPROPID?forceUpdate=true | $NEWSTRING | | 200 |  | | 1 | |
+
+| script |
+| string search replace; | $SAVEDPOPCRIMESYSPROP | [{":{";false}]:false} | : | ; |
+
+| generic service validator fixture |
+| requestType | serviceName | requestBody | customHeaders | getResponseCode? | getResponseMessage? | getResponseId? | getResultCount? | getUrl? |
+| GET | /sysprop-service/sysprops/?name=POPCrimeDataSource | | | 200 |  | $POPCRIMESYSPROPID=| 1 | |
+| PUT | /sysprop-service/sysprops/$POPCRIMESYSPROPID?forceUpdate=true | $NEWSTRING | | 200 |  | | 1 | |
+
+| script |
+| string search replace; | $SAVEDPOPADULTSYSPROP | [{":{";false}]:false} | : | ; |
+
+| generic service validator fixture |
+| requestType | serviceName | requestBody | customHeaders | getResponseCode? | getResponseMessage? | getResponseId? | getResultCount? | getUrl? |
+| GET | /sysprop-service/sysprops/?name=POPILPAdultDataSource | | | 200 |  | $POPADULTSYSPROPID=| 1 | |
+| PUT | /sysprop-service/sysprops/$POPADULTSYSPROPID?forceUpdate=true | $NEWSTRING | | 200 |  | | 1 | |
+
+| script |
+| string search replace; | $SAVEDPOPJUVSYSPROP | [{":{";false}]:false} | : | ; |
+
+| generic service validator fixture |
+| requestType | serviceName | requestBody | customHeaders | getResponseCode? | getResponseMessage? | getResponseId? | getResultCount? | getUrl? |
+| GET | /sysprop-service/sysprops/?name=POPILPJuvenileDataSource | | | 200 |  | $POPJUVSYSPROPID=| 1 | |
+| PUT | /sysprop-service/sysprops/$POPJUVSYSPROPID?forceUpdate=true | $NEWSTRING | | 200 |  | | 1 | |
+
+| script |
+| string search replace; | $SAVEDPOPWEATHERSYSPROP | [{":{";false}]:false} | : | ; |
+
+| generic service validator fixture |
+| requestType | serviceName | requestBody | customHeaders | getResponseCode? | getResponseMessage? | getResponseId? | getResultCount? | getUrl? |
+| GET | /sysprop-service/sysprops/?name=POPWeatherDataSource | | | 200 |  | $POPWEATHERSYSPROPID=| 1 | |
+| PUT | /sysprop-service/sysprops/$POPWEATHERSYSPROPID?forceUpdate=true | $NEWSTRING | | 200 |  | | 1 | |
+

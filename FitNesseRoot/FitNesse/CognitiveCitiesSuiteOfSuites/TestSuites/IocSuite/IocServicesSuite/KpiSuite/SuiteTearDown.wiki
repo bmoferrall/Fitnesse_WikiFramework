@@ -1,0 +1,21 @@
+---
+Test
+---
+<test page>
+
+!define TEST_SYSTEM {slim}
+!path   ./CognitiveCitiesTesting.jar
+
+'''Include Variable Definitions'''
+
+!include <IocServicesSuite.SetUpVariables
+
+'''Include Datasource Tear Down'''
+
+!include <IocSuite.IocHelperSuite.IcaHelperSuite.IcaTargetedCrimeDatasourceTearDown
+
+!include <IocSuite.IocHelperSuite.ResourceKeyCleanUp
+
+'''Include main Suite TearDown page'''
+
+!include <IocServicesSuite.SuiteTearDown

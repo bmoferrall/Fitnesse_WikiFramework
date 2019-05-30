@@ -6,6 +6,7 @@ Test
 
 !define TEST_SYSTEM {slim}
 !path   ./CognitiveCitiesTesting.jar
+
 '''CLEAN UP DATASOURCE'''
 
 | generic service validator fixture |

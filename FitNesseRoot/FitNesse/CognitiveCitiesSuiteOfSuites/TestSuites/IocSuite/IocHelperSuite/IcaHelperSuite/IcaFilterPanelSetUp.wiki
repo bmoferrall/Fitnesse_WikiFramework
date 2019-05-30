@@ -1,0 +1,38 @@
+---
+Help: Create ICA filter panels
+Test
+---
+<test page>
+
+!define TEST_SYSTEM {slim}
+!path   ./CognitiveCitiesTesting.jar
+'''CREATE FILTER PANELS'''
+
+'''Create i18n resources for filter panels'''
+
+| generic service validator fixture |
+| requestType | serviceName | requestBody | customHeaders | getResponseCode? | getResponseMessage? | getResponseId? | getResultCount? | getUrl? |
+| POST | /i18n-service/resources | {"group": "Fitnesse", "locale":"en", "key":"ICAFilter_Fitnesse_CrimePanel", "value":"Crime (Fitnesse)","messages": []} | | | | | | |
+| POST | /i18n-service/resources | {"group": "Fitnesse", "locale":"en", "key":"ICAFilter_Fitnesse_POI", "value":"Persons of Interest (Fitnesse)","messages": []} | | | | | | |
+| POST | /i18n-service/resources | {"group": "Fitnesse", "locale":"en", "key":"ICAFilter_Fitnesse_Areas", "value":"Areas (Fitnesse)","messages": []} | | | | | | |
+
+'''Crime Panel'''
+
+| generic service validator fixture |
+| requestType | serviceName | requestBody | customHeaders | getResponseCode? | getResponseMessage? | getResponseId? | getResultCount? | getUrl? |
+| POST | /filter-service/panels/ | {"label":{"group":"Fitnesse","key":"ICAFilter_Fitnesse_CrimePanel","resources":[{"group":"Fitnesse","locale":"en","key":"ICAFilter_Fitnesse_CrimePanel","value":"Crime (Fitnesse)"}]},"color":"#af33ff","ordinal":40,"dataSources":[{"dataSourceId":$DSID_ICACRIMEALL,"ordinal":0},{"dataSourceId":$DSID_ICACRIMETARG,"ordinal":1},{"dataSourceId":$DSID_ICAADULTARRESTS,"ordinal":2},{"dataSourceId":$DSID_ICAJUVENILEARRESTS,"ordinal":3}]} | | 200 | | $FID_ICACRIME= | | |
+| GET | /filter-service/panels/$FID_ICACRIME | | | 200 | =~/(?i)"i18nLabel":"Crime \(Fitnesse\)"/ | | 1 | |
+
+'''Persons of Interest Panel'''
+
+| generic service validator fixture |
+| requestType | serviceName | requestBody | customHeaders | getResponseCode? | getResponseMessage? | getResponseId? | getResultCount? | getUrl? |
+| POST | /filter-service/panels/ | {"label":{"group":"Fitnesse","key":"ICAFilter_Fitnesse_POI","resources":[{"group":"Fitnesse","locale":"en","key":"ICAFilter_Fitnesse_POI","value":"Persons of Interest (Fitnesse)"}]},"color":"#ca33ff","ordinal":41,"dataSources":[{"dataSourceId":$DSID_ICAADULTS,"ordinal":0},{"dataSourceId":$DSID_ICAJUVENILES,"ordinal":1}]} | | 200 | | $FID_ICAPOI= | | |
+| GET | /filter-service/panels/$FID_ICAPOI | | | 200 | =~/(?i)"i18nLabel":"Persons of Interest \(Fitnesse\)"/ | | 1 | |
+
+'''Areas Panel'''
+
+| generic service validator fixture |
+| requestType | serviceName | requestBody | customHeaders | getResponseCode? | getResponseMessage? | getResponseId? | getResultCount? | getUrl? |
+| POST | /filter-service/panels/ | {"label":{"group":"Fitnesse","key":"ICAFilter_Fitnesse_Areas","resources":[{"group":"Fitnesse","locale":"en","key":"ICAFilter_Fitnesse_Areas","value":"Areas (Fitnesse)"}]},"color":"#e033ff","ordinal":42,"dataSources":[{"dataSourceId":$DSID_ICADISTRICTS,"ordinal":0},{"dataSourceId":$DSID_ICAREPAREAS,"ordinal":1},{"dataSourceId":$DSID_ICAZONES,"ordinal":2}]} | | 200 | | $FID_ICAAREAS= | | |
+| GET | /filter-service/panels/$FID_ICAAREAS | | | 200 | =~/(?i)"i18nLabel":"Areas \(Fitnesse\)"/ | | 1 | |

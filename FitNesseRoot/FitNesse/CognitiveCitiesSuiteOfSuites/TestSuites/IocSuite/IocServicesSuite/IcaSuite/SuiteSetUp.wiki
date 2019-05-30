@@ -1,0 +1,35 @@
+---
+Help: Initialise data sources, filters and configuration for ICA tests
+Test
+---
+<test page>
+
+!define TEST_SYSTEM {slim}
+!path   ./CognitiveCitiesTesting.jar
+
+'''Include main Suite Set Up page'''
+
+!include <IocServicesSuite.SuiteSetUp
+
+'''Include Variable Definitions'''
+
+!include <IocServicesSuite.SetUpVariables
+
+'''Include Datasource, Map, Filter and System Property Set Up'''
+
+!include <IocSuite.IocHelperSuite.IcaHelperSuite.IcaDatabaseSetUp
+!include <IocSuite.IocHelperSuite.IcaHelperSuite.IcaAllCrimeDatasourceSetUp
+!include <IocSuite.IocHelperSuite.IcaHelperSuite.IcaTargetedCrimeDatasourceSetUp
+!include <IocSuite.IocHelperSuite.IcaHelperSuite.IcaWeatherDatasourceSetUp
+!include <IocSuite.IocHelperSuite.IcaHelperSuite.IcaJuvenileDatasourceSetUp
+!include <IocSuite.IocHelperSuite.IcaHelperSuite.IcaAdultDatasourceSetUp
+!include <IocSuite.IocHelperSuite.IcaHelperSuite.IcaJuvenileArrestsDatasourceSetUp
+!include <IocSuite.IocHelperSuite.IcaHelperSuite.IcaAdultArrestsDatasourceSetUp
+!include <IocSuite.IocHelperSuite.IcaHelperSuite.IcaReportingAreasDatasourceSetUp
+!include <IocSuite.IocHelperSuite.IcaHelperSuite.IcaDistrictsDatasourceSetUp
+!include <IocSuite.IocHelperSuite.IcaHelperSuite.IcaZonesDatasourceSetUp
+!include <IocSuite.IocHelperSuite.IcaHelperSuite.IcaGeoMapSetUp
+!include <IocSuite.IocHelperSuite.IcaHelperSuite.IcaFilterPanelSetUp
+!include <IocSuite.IocHelperSuite.IcaHelperSuite.IcaSystemPropertiesSetUp
+
+

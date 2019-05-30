@@ -15,5 +15,6 @@ Test
 
 !include <IocSuite.IocHelperSuite.SopDefinitionTearDown
 
+!include <IocSuite.IocHelperSuite.ResourceKeyCleanUp
 
 !include <IocServicesSuite.SuiteTearDown

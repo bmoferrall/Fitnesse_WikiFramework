@@ -1,0 +1,43 @@
+---
+Help: Update ICA system properties with the correct information
+Test
+---
+<test page>
+
+!define TEST_SYSTEM {slim}
+!path   ./CognitiveCitiesTesting.jar
+
+'''Include Variable Definitions'''
+
+!include <IocSuite.IocServicesSuite.SetUpVariables
+
+'''Save value of key system properties so we can restore at the end of the test'''
+
+| generic service validator fixture |
+| requestType | serviceName | requestBody | customHeaders | getResponseCode? | getResponseMessage? | getResponseId? | getResultCount? | getUrl? |
+| GET | /sysprop-service/sysprops/?name=POPAllCrimeDataSource | | | 200 | $SAVEDPOPALLCRIMESYSPROP= | | 1 | |
+| GET | /sysprop-service/sysprops/?name=POPArrestDataSources | | | 200 | $SAVEDPOPARRESTSYSPROP= | | 1 | |
+| GET | /sysprop-service/sysprops/?name=POPCrimeDataSource | | | 200 | $SAVEDPOPCRIMESYSPROP= | | 1 | |
+| GET | /sysprop-service/sysprops/?name=POPILPAdultDataSource | | | 200 | $SAVEDPOPADULTSYSPROP= | | 1 | |
+| GET | /sysprop-service/sysprops/?name=POPILPJuvenileDataSource | | | 200 | $SAVEDPOPJUVSYSPROP= | | 1 | |
+| GET | /sysprop-service/sysprops/?name=POPWeatherDataSource | | | 200 | $SAVEDPOPWEATHERSYSPROP= | | 1 | |
+
+'''Configure System Properties using up-to-date datasource IDs'''
+
+| script |
+| #''Retrieve current timestamp'' |
+| current time; |
+| read service ; | /sysprop-service/sysprops/?name=ASKUrl | | 200 | | 1 |
+| update service; | /sysprop-service/sysprops/$RID?forceUpdate=true | {"id":$RID,"lastUpdateDate":$CURRENTTIMESTAMP,"name":"ASKUrl","value":"https:\/\/${WEBSERVER}:${WEBPORT}\/askws\/rest\/","description":{"group":"SyspropApp","key":"i18n_2c2fda66-5b71-4164-81ef-275badc286ec","resources":[{"group":"SyspropApp","locale":"en","key":"i18n_2c2fda66-5b71-4164-81ef-275badc286ec","value":"The URL of the ASK Server"}]},"encrypted":false,"adminOnly":false,"group":"CROS"} | | 200 |
+| read service ; | /sysprop-service/sysprops/?name=POPAllCrimeDataSource | | 200 | | 1 |
+| update service; | /sysprop-service/sysprops/$RID?forceUpdate=true | {"id":$RID,"lastUpdateDate":$CURRENTTIMESTAMP,"name":"POPAllCrimeDataSource","value":"{\"detailGroups\":null,\"datasource\":$DSID_ICACRIMEALL,\"groupBy\":[],\"crimeType\":\"OFFENSE\"}","description":{"group":"SyspropApp","key":"i18n_2c2fda66-5b71-4164-81ef-285bbdc286ec","resources":[{"group":"SyspropApp","locale":"en","key":"i18n_2c2fda66-5b71-4164-81ef-285bbdc286ec","value":"The configuation in JSON format of the Integrated Crime Analytics all crime data source.  This should be configured in the Data Source Mapping configuration page."}]},"encrypted":false,"adminOnly":false,"group":"CROS"} | | 200 |
+| read service ; | /sysprop-service/sysprops/?name=POPArrestDataSources | | 200 | | 1 |
+| update service; | /sysprop-service/sysprops/$RID?forceUpdate=true | {"id":$RID,"lastUpdateDate":$CURRENTTIMESTAMP,"name":"POPArrestDataSources","value":"{\"juvenileArrestRecordsDetails\":[{\"id\":\"ARRESTDATE\"},{\"id\":\"ARRID\"},{\"id\":\"CHARGES\"},{\"id\":\"PRCRIMHIS\"},{\"id\":\"SUBJECTID\"}],\"juvenileArrestRecordSubjectId\":\"SUBJECTID\",\"juvenileArrestRecordsDataSourceId\":$DSID_ICAJUVENILEARRESTS,\"adultArrestRecordsDataSourceId\":$DSID_ICAADULTARRESTS,\"adultArrestRecordSubjectId\":\"SUBJECTID\",\"adultArrestRecordsDetails\":[{\"id\":\"ARRESTDATE\"},{\"id\":\"ARRID\"},{\"id\":\"CHARGES\"},{\"id\":\"PRCRIMHIS\"},{\"id\":\"SUBJECTID\"}]}","description":{"group":"SyspropApp","key":"i18n_2c2fda66-5b93-4164-81ef-285bbdc286ec","resources":[{"group":"SyspropApp","locale":"en","key":"i18n_2c2fda66-5b93-4164-81ef-285bbdc286ec","value":"The configuation in JSON format of the Integrated Crime Analytics arrest records data sources.  This should be configured in the Data Source Mapping configuration page."}]},"encrypted":false,"adminOnly":false,"group":"CROS"} | | 200 |
+| read service ; | /sysprop-service/sysprops/?name=POPCrimeDataSource | | 200 | | 1 |
+| update service; | /sysprop-service/sysprops/$RID?forceUpdate=true | {"id":$RID,"lastUpdateDate":$CURRENTTIMESTAMP,"name":"POPCrimeDataSource","value":"{\"detailGroups\":null,\"datasource\":$DSID_ICACRIMETARG,\"groupBy\":[{\"id\":\"AREA_ID\"},{\"id\":\"DISTRICTID\"},{\"id\":\"STARTDAYOFWEEK\"},{\"id\":\"STARTHOUR\"},{\"id\":\"TYPE\"},{\"id\":\"ZONEID\"}],\"crimeType\":\"TYPE\"}","description":{"group":"SyspropApp","key":"i18n_2c2fdb33-5b93-4164-81ef-285bbdc286ec","resources":[{"group":"SyspropApp","locale":"en","key":"i18n_2c2fdb33-5b93-4164-81ef-285bbdc286ec","value":"The configuation in JSON format of the Integrated Crime Analytics targeted crime data source. This should be configured in the Data Source Mapping configuration page."}]},"encrypted":false,"adminOnly":false,"group":"CROS"} | | 200 |
+| read service ; | /sysprop-service/sysprops/?name=POPILPAdultDataSource | | 200 | | 1 |
+| update service; | /sysprop-service/sysprops/$RID?forceUpdate=true | {"id":$RID,"lastUpdateDate":$CURRENTTIMESTAMP,"name":"POPILPAdultDataSource","value":"{\"target_zone_data_source\":$DSID_ICAZONES,\"target_zone_data_source_id\":\"ZONEID\",\"datasource\":$DSID_ICAADULTS,\"display_properties\":[\"DOB\",\"GENDER\",\"RACE\",\"STATUS\"],\"target_zone\":\"TZONE\",\"subjectId\":\"SUBJECTID\",\"status\":\"STATUS\"}","description":{"group":"SyspropApp","key":"i18n_4b4fdb33-5b93-4164-81ef-285bbdc286ec","resources":[{"group":"SyspropApp","locale":"en","key":"i18n_4b4fdb33-5b93-4164-81ef-285bbdc286ec","value":"The configuation in JSON format of the Integrated Crime Analytics adult persons of interest data source.  This should be configured in the Data Source Mapping configuration page."}]},"encrypted":false,"adminOnly":false,"group":"CROS"} | | 200 |
+| read service ; | /sysprop-service/sysprops/?name=POPILPJuvenileDataSource | | 200 | | 1 |
+| update service; | /sysprop-service/sysprops/$RID?forceUpdate=true | {"id":$RID,"lastUpdateDate":$CURRENTTIMESTAMP,"name":"POPILPJuvenileDataSource","value":"{\"target_zone_data_source\":$DSID_ICAZONES,\"target_zone_data_source_id\":\"ZONEID\",\"datasource\":$DSID_ICAJUVENILES,\"display_properties\":[\"DOB\",\"GENDER\",\"RACE\",\"STATUS\"],\"target_zone\":\"TZONE\",\"subjectId\":\"SUBJECTID\",\"status\":\"STATUS\"}","description":{"group":"SyspropApp","key":"i18n_4b4fdb33-5b93-4243-81ef-285bbdc286ec","resources":[{"group":"SyspropApp","locale":"en","key":"i18n_4b4fdb33-5b93-4243-81ef-285bbdc286ec","value":"The configuation in JSON format of the Integrated Crime Analytics juvenile persons of interest data source. This should be configured in the Data Source Mapping configuration page."}]},"encrypted":false,"adminOnly":false,"group":"CROS"} | | 200 |
+| read service ; | /sysprop-service/sysprops/?name=POPWeatherDataSource | | 200 | | 1 |
+| update service; | /sysprop-service/sysprops/$RID?forceUpdate=true | {"id":$RID,"lastUpdateDate":$CURRENTTIMESTAMP,"name":"POPWeatherDataSource","value":"$DSID_ICAWEATHER","description":{"group":"SyspropApp","key":"i18n_4b4ca333-5b93-4243-81ef-285bbdc286ec","resources":[{"group":"SyspropApp","locale":"en","key":"i18n_4b4ca333-5b93-4243-81ef-285bbdc286ec","value":"The configuation in JSON format of the Integrated Crime Analytics weather data source. This should be configured in the Data Source Mapping configuration page."}]},"encrypted":false,"adminOnly":false,"group":"CROS"} | | 200 |

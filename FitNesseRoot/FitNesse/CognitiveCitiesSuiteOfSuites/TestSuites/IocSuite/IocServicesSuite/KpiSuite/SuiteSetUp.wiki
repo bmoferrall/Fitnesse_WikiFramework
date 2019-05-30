@@ -1,0 +1,19 @@
+---
+Test
+---
+<test page>
+
+!define TEST_SYSTEM {slim}
+!path   ./CognitiveCitiesTesting.jar
+
+'''Include main Suite Set Up page'''
+
+!include <IocServicesSuite.SuiteSetUp
+
+'''Include Variable Definitions'''
+
+!include <IocServicesSuite.SetUpVariables
+
+'''Include ICA Target Crime Datasource'''
+
+!include <IocSuite.IocHelperSuite.IcaHelperSuite.IcaTargetedCrimeDatasourceSetUp

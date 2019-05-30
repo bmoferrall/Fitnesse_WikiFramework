@@ -5,15 +5,18 @@ Test
 
 !define TEST_SYSTEM {slim}
 
+!include <IocSuite.IocServicesSuite.SetUpVariables
+
 |Import                       |
 |com.ibm.cognitivecities.fitnesse.fixtures.rest    |
 |com.ibm.cognitivecities.fitnesse.fixtures.database|
+|com.ibm.cognitivecities.fitnesse.fixtures.util|
 
 !|ApplicationSetUp                              |
 |protocol|host                         |port|urlbase|user    |password|
-|https|dubperfwow2-web.mul.ie.ibm.com|443|/ibm/ioc/api|sysadmin|us3rpa88|
+|https|${WEBSERVER}|${WEBPORT}|/ibm/ioc/api|${IOCUSER}|${IOCPASSWORD}|
 
 !|DatabaseSetUp                                                                                               |
 |connectionName|databaseName|host                        |port |user    |password|connectionURL?|connectionOK?|
-|iocdb          |iocdb       |dubperfwow2-db.mul.ie.ibm.com|50000|db2i1own|us3rpa88|              |true         |
-|iocdata        |iocdata       |dubperfwow2-db.mul.ie.ibm.com|50000|db2i1own|us3rpa88|              |true         |
+|iocdb          |iocdb       |${DBSERVER}|${DBPORT}|${DBUSER}|${DBPASSWORD}|              |true         |
+|iocdata        |iocdata       |${DBSERVER}|${DBPORT}|${DBUSER}|${DBPASSWORD}|              |true         |

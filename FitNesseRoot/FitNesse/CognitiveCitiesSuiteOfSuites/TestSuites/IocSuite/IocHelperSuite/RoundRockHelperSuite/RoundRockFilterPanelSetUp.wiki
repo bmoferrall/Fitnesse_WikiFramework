@@ -6,28 +6,34 @@ Test
 
 !define TEST_SYSTEM {slim}
 !path   ./CognitiveCitiesTesting.jar
-'''Include Variable Definitions'''
 
-!include <IocSuite.IocServicesSuite.SetUpVariables
 '''CREATE FILTER PANELS'''
+
+'''Create i18n resources for filter panels'''
+
+| generic service validator fixture |
+| requestType | serviceName | requestBody | customHeaders | getResponseCode? | getResponseMessage? | getResponseId? | getResultCount? | getUrl? |
+| POST | /i18n-service/resources | {"group": "Fitnesse", "locale":"en", "key":"RRFilter_Fitnesse_PublicSafetyPanel", "value":"Public Safety (Fitnesse)","messages": []} | | | | | | |
+| POST | /i18n-service/resources | {"group": "Fitnesse", "locale":"en", "key":"RRFilter_Fitnesse_PermitsAndLicenses", "value":"Persons and Licenses (Fitnesse)","messages": []} | | | | | | |
+| POST | /i18n-service/resources | {"group": "Fitnesse", "locale":"en", "key":"RRFilter_Fitnesse_Places", "value":"Places (Fitnesse)","messages": []} | | | | | | |
 
 '''Public Safety Panel'''
 
 | generic service validator fixture |
 | requestType | serviceName | requestBody | customHeaders | getResponseCode? | getResponseMessage? | getResponseId? | getResultCount? | getUrl? |
-| POST | /filter-service/panels/ | {"label":{"group":"FilterPanel","key":"i18n_dfcac18f-3cb1-4afe-8efe-90db877bc06a","resources":[{"group":"FilterPanel","locale":"en","key":"i18n_dfcac18f-3cb1-4afe-8efe-90db877bc06a","value":"Public Safety (Fitnesse)"}]},"color":"#808000","ordinal":20,"dataSources":[{"dataSourceId":$DSID_RR311CALLS,"ordinal":0},{"dataSourceId":$DSID_RR911CALLS,"ordinal":1},{"dataSourceId":$DSID_RRPOLINC,"ordinal":2}]} | | 200 | | $FID_PUBLICSAFETY= | | |
+| POST | /filter-service/panels/ | {"label":{"group":"Fitnesse","key":"RRFilter_Fitnesse_PublicSafetyPanel","resources":[{"group":"Fitnesse","locale":"en","key":"RRFilter_Fitnesse_PublicSafetyPanel","value":"Public Safety (Fitnesse)"}]},"color":"#808000","ordinal":20,"dataSources":[{"dataSourceId":$DSID_RR311CALLS,"ordinal":0},{"dataSourceId":$DSID_RR911CALLS,"ordinal":1},{"dataSourceId":$DSID_RRPOLINC,"ordinal":2}]} | | 200 | | $FID_PUBLICSAFETY= | | |
 | GET | /filter-service/panels/$FID_PUBLICSAFETY | | | 200 | =~/(?i)"i18nLabel":"Public Safety \(Fitnesse\)"/ | | 1 | |
 
 '''Permits and Licenses Panel'''
 
 | generic service validator fixture |
 | requestType | serviceName | requestBody | customHeaders | getResponseCode? | getResponseMessage? | getResponseId? | getResultCount? | getUrl? |
-| POST | /filter-service/panels/ | {"label":{"group":"FilterPanel","key":"i18n_dfcac18f-3cb1-4afe-8efe-90db877bc06b","resources":[{"group":"FilterPanel","locale":"en","key":"i18n_dfcac18f-3cb1-4afe-8efe-90db877bc06b","value":"Permits and Licenses (Fitnesse)"}]},"color":"#800000","ordinal":21,"dataSources":[{"dataSourceId":$DSID_RRBUSLIC,"ordinal":0},{"dataSourceId":$DSID_RRLPERMITS,"ordinal":1},{"dataSourceId":$DSID_RRLSELLERS,"ordinal":2},{"dataSourceId":$DSID_RRTLPERMITS,"ordinal":3}]} | | 200 | | $FID_LICPERMIT= | | |
+| POST | /filter-service/panels/ | {"label":{"group":"Fitnesse","key":"RRFilter_Fitnesse_PermitsAndLicenses","resources":[{"group":"Fitnesse","locale":"en","key":"RRFilter_Fitnesse_PermitsAndLicenses","value":"Permits and Licenses (Fitnesse)"}]},"color":"#800000","ordinal":21,"dataSources":[{"dataSourceId":$DSID_RRBUSLIC,"ordinal":0},{"dataSourceId":$DSID_RRLPERMITS,"ordinal":1},{"dataSourceId":$DSID_RRLSELLERS,"ordinal":2},{"dataSourceId":$DSID_RRTLPERMITS,"ordinal":3}]} | | 200 | | $FID_LICPERMIT= | | |
 | GET | /filter-service/panels/$FID_LICPERMIT | | | 200 | =~/(?i)"i18nLabel":"Permits and Licenses \(Fitnesse\)"/ | | 1 | |
 
 '''Places Panel'''
 
 | generic service validator fixture |
 | requestType | serviceName | requestBody | customHeaders | getResponseCode? | getResponseMessage? | getResponseId? | getResultCount? | getUrl? |
-| POST | /filter-service/panels/ | {"label":{"group":"FilterPanel","key":"i18n_dfcac18f-3cb1-4afe-8efe-90db877bc06c","resources":[{"group":"FilterPanel","locale":"en","key":"i18n_dfcac18f-3cb1-4afe-8efe-90db877bc06c","value":"Places (Fitnesse)"}]},"color":"#008080","ordinal":22,"dataSources":[{"dataSourceId":$DSID_RRAREAS,"ordinal":0},{"dataSourceId":$DSID_RRBUSSTOPS,"ordinal":1}]} | | 200 | | $FID_PLACES= | | |
+| POST | /filter-service/panels/ | {"label":{"group":"Fitnesse","key":"RRFilter_Fitnesse_Places","resources":[{"group":"Fitnesse","locale":"en","key":"RRFilter_Fitnesse_Places","value":"Places (Fitnesse)"}]},"color":"#008080","ordinal":22,"dataSources":[{"dataSourceId":$DSID_RRAREAS,"ordinal":0},{"dataSourceId":$DSID_RRBUSSTOPS,"ordinal":1}]} | | 200 | | $FID_PLACES= | | |
 | GET | /filter-service/panels/$FID_PLACES | | | 200 | =~/(?i)"i18nLabel":"Places \(Fitnesse\)"/ | | 1 | |

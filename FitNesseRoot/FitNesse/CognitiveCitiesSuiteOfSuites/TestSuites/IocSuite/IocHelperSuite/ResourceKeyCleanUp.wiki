@@ -1,0 +1,15 @@
+---
+Help: Remove I18N resource entries that were added for Fitnesse tests
+Test
+---
+<test page>
+
+!define TEST_SYSTEM {slim}
+!path   ./CognitiveCitiesTesting.jar
+
+| generic database fixture |
+| # comment | connectionName | statementType | statementText | responseFormat | getResponse? | getResultCount? | getResponseMessage? |
+| Delete resource entries under group 'Fitnesse' | iocdb | delete | delete from ioc.i18n_resource where group='Fitnesse' | |  | | OK |
+
+
+

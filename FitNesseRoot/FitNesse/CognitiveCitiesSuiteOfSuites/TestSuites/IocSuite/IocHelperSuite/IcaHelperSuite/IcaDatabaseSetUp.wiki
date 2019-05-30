@@ -1,0 +1,27 @@
+---
+Help: Load source shape file data and adult/juvenile data
+Test
+---
+<test page>
+
+!define TEST_SYSTEM {slim}
+!path   ./CognitiveCitiesTesting.jar
+
+'''Include Variable Definitions'''
+
+!include <IocSuite.IocServicesSuite.SetUpVariables
+
+'''Copy source zip with shape files and sql scripts to the database server '''
+
+| script |
+| remote file copy; | ./testfiles/ica/junit_ica.zip | /tmp/junit_ica.zip | ${DBSERVER} | ${SSHUSER} | ${PRIVATEKEYFILE} | ${PRIVATEKEYPWD} |
+
+'''Install data'''
+
+| script |
+| remote command execution; | cd /tmp;unzip -o junit_ica.zip;chmod -R 777 junit_ica;dos2unix junit_ica/ilp/createSampleData.sh;su - db2i1own -c \"/tmp/junit_ica/ilp/createSampleData.sh\"; | ${DBSERVER} | ${SSHUSER} | ${PRIVATEKEYFILE} | ${PRIVATEKEYPWD} |
+
+'''Clean up temp files'''
+
+| script |
+| remote command execution; | cd /tmp;rm -f junit_ica.zip;rm -f *.out;rm -fR junit_ica | ${DBSERVER} | ${SSHUSER} | ${PRIVATEKEYFILE} | ${PRIVATEKEYPWD} |

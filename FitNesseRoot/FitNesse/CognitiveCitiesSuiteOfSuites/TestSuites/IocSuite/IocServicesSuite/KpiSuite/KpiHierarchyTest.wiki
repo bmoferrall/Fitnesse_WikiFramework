@@ -1,0 +1,68 @@
+<test page>
+
+!define TEST_SYSTEM {slim}
+!path   ./CognitiveCitiesTesting.jar
+
+'''Include Variable Definitions'''
+
+!include <IocSuite.IocServicesSuite.SetUpVariables
+
+!define KPINAME {larceny_theft_crime_kpi_fitnesse}
+!define KPIHIERARCHYPID {larceny_theft_crime_kpihierarchy_pid_fitnesse}
+!define KPIHIERARCHYID {larceny_theft_crime_kpihierarchy_id_fitnesse}
+
+'''Create i18n resources for the data source'''
+
+| generic service validator fixture |
+| requestType | serviceName | requestBody | customHeaders | getResponseCode? | getResponseMessage? | getResponseId? | getResultCount? | getUrl? |
+|POST|/i18n-service/resources|{"group": "Fitnesse", "locale":"en", "key":"ICAKpi_Fitnesse_LarcenyTheftCrime_Name", "value":"Larceny and Theft Crime (Fitnesse)","messages": []}|||||||
+|POST|/i18n-service/resources|{"group": "Fitnesse", "locale":"en", "key":"ICAKpi_Fitnesse_LarcenyTheftCrime_Desc", "value":"Larceny and theft crime description (Fitnesse)","messages": []}|||||||
+|POST|/i18n-service/resources|{"group": "Fitnesse", "locale":"en", "key":"ICAKpi_Fitnesse_RangeNormal", "value":"Normal","messages": []}|||||||
+|POST|/i18n-service/resources|{"group": "Fitnesse", "locale":"en", "key":"ICAKpi_Fitnesse_RangeCaution", "value":"Caution","messages": []}|||||||
+|POST|/i18n-service/resources|{"group": "Fitnesse", "locale":"en", "key":"ICAKpi_Fitnesse_RangeCritical", "value":"Critical","messages": []}|||||||
+|POST|/i18n-service/resources|{"group": "Fitnesse", "locale":"en", "key":"ICAKpi_Fitnesse_HierarchyRootName", "value":"Crime (Fitnesse)","messages": []}|||||||
+|POST|/i18n-service/resources|{"group": "Fitnesse", "locale":"en", "key":"ICAKpi_Fitnesse_HierarchyChildName", "value":"Larceny and Theft Crime (Fitnesse)","messages": []}|||||||
+
+'''Configure KPI'''
+
+| generic service validator fixture |
+| requestType | serviceName | requestBody | customHeaders | getResponseCode? | getResponseMessage? | getResponseId? | getResultCount? | getUrl? |
+| POST | /kpi-service/iockpis | {"kpiHistoryEnabled":true,"name":"${KPINAME}","label":{"group":"kpi","key":"ICAKpi_Fitnesse_LarcenyTheftCrime_Name","resources":[{"group":"kpi","locale":"en","key":"ICAKpi_Fitnesse_LarcenyTheftCrime_Name","value":"Larceny and Theft Crime (Fitnesse)"}]},"kpiCalcMethod":"none","description":{"group":"kpi","key":"ICAKpi_Fitnesse_LarcenyTheftCrime_Desc","resources":[{"group":"kpi","locale":"en","key":"ICAKpi_Fitnesse_LarcenyTheftCrime_Desc","value":"Larceny and theft crime description (Fitnesse)"}]},"schedule":{"enabled":true,"interval":60000}} | | 201 | =~/(?i)"name":"${KPINAME}"/ | $KPIDEFID= | 1 | |
+| PUT | /kpi-service/iockpis/$KPIDEFID | {"kpiHistoryEnabled":true,"name":"${KPINAME}","label":{"group":"kpi","key":"ICAKpi_Fitnesse_LarcenyTheftCrime_Name","resources":[{"group":"kpi","locale":"en","key":"ICAKpi_Fitnesse_LarcenyTheftCrime_Name","value":"Larceny and Theft Crime (Fitnesse)"}]},"kpiCalcMethod":"aggregate","description":{"group":"kpi","key":"ICAKpi_Fitnesse_LarcenyTheftCrime_Desc","resources":[{"group":"kpi","locale":"en","key":"ICAKpi_Fitnesse_LarcenyTheftCrime_Desc","value":"Larceny and theft crime description (Fitnesse)"}]},"schedule":{"enabled":true,"interval":60000},"id":"$KPIDEFID","aggregateCalculation":{"aggregateFunction":"COUNT","dataSourceUniqueId":"${DS_NAME_ICA_CRIMETARG}","propertyId":"Property_OBJECTID","metricFilters":[{"filterMetricId":"NAME","operator":"EQUALS","filterValue":"Larceny/Theft","caseSensitive":true}],"areaFilters":[],"timeFilter":{"timePeriodColumn":"STARTDATETIME","fixedPeriodStart":"2018-12-01T00:00:00","fixedPeriodEnd":"2018-12-31T00:00:00","timePeriod":"FIXED"}},"kpiRanges":[{"name":"Normal","label":{"group":"KPI","key":"ICAKpi_Fitnesse_RangeNormal","resources":[{"group":"KPI","locale":"en","key":"ICAKpi_Fitnesse_RangeNormal","value":"Normal"}]},"startValue":1,"endValue":250,"rangeColor":"#32cd32","order":0},{"name":"Caution","label":{"group":"KPI","key":"ICAKpi_Fitnesse_RangeCaution","resources":[{"group":"KPI","locale":"en","key":"ICAKpi_Fitnesse_RangeCaution","value":"Caution"}]},"startValue":250,"endValue":500,"rangeColor":"#ffa500","order":1},{"name":"Critical","label":{"group":"KPI","key":"ICAKpi_Fitnesse_RangeCritical","resources":[{"group":"KPI","locale":"en","key":"ICAKpi_Fitnesse_RangeCritical","value":"Critical"}]},"startValue":500,"endValue":10000,"rangeColor":"#ff4500","order":2}]} | | 200 | =~/(?i)"name":"${KPINAME}"/ | $KPIDEFID= | 1 | |
+
+'''Configure KPI Hierarchy'''
+
+| generic service validator fixture |
+| requestType | serviceName | requestBody | customHeaders | getResponseCode? | getResponseMessage? | getResponseId? | getResultCount? | getUrl? |
+| GET | /kpi-service/ranges |  | | 200 | =~/(?i)"name":"Normal","colorValue":"#32cd32"/ | | 1 | |
+| GET | /kpi-service/iockpis |  | | 200 | =~/(?i)"name":"${KPINAME}"/ | | >=1 | |
+| GET | /kpi-service/iockpis/$KPIDEFID |  | | 200 | =~/(?i)"name":"${KPINAME}"/ | | 1 | |
+| POST | /kpi-service/kpihierarchies | {"identifier":"id","label":"label","items":[{"name":"Crime (Fitnesse)","id":"${KPIHIERARCHYPID}","modelId":"","kpiId":"","entryType":"model","versionId":"","icon":"","permissions":[],"namedareas":[],"reports":[],"label":"{\"group\":\"kpi\",\"key\":\"ICAKpi_Fitnesse_HierarchyRootName\"}","children":[{"_reference":"${KPIHIERARCHYID}"}]},{"name":"Larceny and Theft Crime (Fitnesse)","id":"${KPIHIERARCHYID}","modelId":"","kpiId":"$KPIDEFID","entryType":"IOC","versionId":"","kpiCalcMethod":"aggregate","permissions":[{"resourceType":"owning-org","identity":"Operators","identityType":"G"},{"resourceType":"owning-org","identity":"SolutionAdmins","identityType":"G"},{"resourceType":"owning-org","identity":"SystemAdmins","identityType":"G"},{"resourceType":"owning-org","identity":"PlatformAdmins","identityType":"G"}],"namedareas":[],"reports":[],"label":{"group":"kpi","key":"ICAKpi_Fitnesse_HierarchyChildName"}}]} | | 201 |  |  |  | |
+| GET | /kpi-service/kpihierarchies |  | | 200 | =~/(?i)"kpiId":"$KPIDEFID"/ |  | 1 | |
+
+'''Pause to allow KPI scheduler time to execute'''
+
+| script |
+| time delay ; | 70000 |
+
+'''Operator Page Checks'''
+
+| generic service validator fixture |
+| requestType | serviceName | requestBody | customHeaders | getResponseCode? | getResponseMessage? | getResponseId? | getResultCount? | getUrl? |
+| GET | /kpi-service/ranges |  | | 200 | =~/(?i)"name":"Normal","colorValue":"#32cd32"/ | | 1 | |
+| GET | /kpi-service/kpihierarchies |  | | 200 | =~/(?i)"kpiId":"$KPIDEFID"/ |  | 1 | |
+| GET | /kpi-service/owningorgs |  | | 200 | =~/(?i)"id":"${KPIHIERARCHYPID}"/ | | 1 | |
+| GET | /kpi-service/kpis |  | | 200 | =~/(?i)"kpiValue":38[0-9].0,.*?,"rangeId":"Caution","dbId":1,"name":"Larceny and Theft Crime \(Fitnesse\)"/ | | 1 | |
+| GET | /kpi-service/kpidsitems/$KPIDEFID?maxresults=1 |  | | 200 | =~/(?i)"type":"Feature","id":[0-9]+/ | | 1 | |
+| GET | /kpi-service/kpihistory/$KPIDEFID?startDateTime=2019-05-13T12:05:53&endDateTime=2019-05-20T12:05:53 |  | | 200 | =~/(?i)"kpiId":"$KPIDEFID"/ | | 1 | |
+| GET | /kpi-service/kpidsitems/$KPIDEFID |  | | 200 | =~/(?i)"type":"Feature","id":[0-9]+/ | | 1 | |
+
+'''Clean Up'''
+
+| generic service validator fixture |
+| requestType | serviceName | requestBody | customHeaders | getResponseCode? | getResponseMessage? | getResponseId? | getResultCount? | getUrl? |
+| DELETE | /kpi-service/iockpis/$KPIDEFID |  | | 204 |  | |  | |
+
+| script |
+| database delete; | iocdb | delete from ioc.kpi_hierarchy where uuid = '${KPIHIERARCHYID}' |
+| database delete; | iocdb | delete from ioc.kpi_hierarchy where uuid = '${KPIHIERARCHYPID}' |

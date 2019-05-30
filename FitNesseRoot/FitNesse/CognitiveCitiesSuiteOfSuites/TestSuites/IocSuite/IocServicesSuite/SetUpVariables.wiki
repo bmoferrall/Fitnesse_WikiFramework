@@ -5,10 +5,24 @@ Test
 
 !define TEST_SYSTEM {slim}
 
-!define APPSERVER {dubperfwow2-app.mul.ie.ibm.com}
-!define APPSERVERUSER {root}
-!define APPSERVERKEYFILE {./testfiles/fitnesse_keyfile.ppk}
-!define APPSERVERKEYPWD {}
+'''General variables'''
+
+!define WEBSERVER {amir-std-ioc-env-web.mulvm.ie.ibm.com}
+!define WEBPORT {9445}
+!define IOCUSER {sysadmin}
+!define IOCPASSWORD {us3rpa88}
+!define ANASERVER {amir-std-ioc-env-ana.mulvm.ie.ibm.com}
+!define APPSERVER {amir-std-env-ap.mulvm.ie.ibm.com}
+!define DBSERVER {dubperfwow-db.mul.ie.ibm.com}
+!define DBUSER {db2i1own}
+!define DBPASSWORD {us3rpa88}
+!define DBPORT {50000}
+!define SSHUSER {root}
+!define PRIVATEKEYFILE {./testfiles/fitnesse_keyfile.ppk}
+!define PRIVATEKEYPWD {}
+
+'''Round Rock variables'''
+
 !define DS_NAME_RR_AREAS {RR_Areas_Fitnesse}
 !define CSV_NAME_RR_AREAS {RR_Areas_Fitnesse.csv}
 !define TT_NAME_RR_AREAS {RR_AREAS_FITNESSE}
@@ -36,3 +50,35 @@ Test
 !define DS_NAME_RR_TLPERMITS {RR_Temp_Liquour_Permits_Fitnesse}
 !define CSV_NAME_RR_TLPERMITS {RR_Temp_Liquour_Permits_Fitnesse.csv}
 !define TT_NAME_RR_TLPERMITS {RR_TEMP_LIQUOUR_PERMITS_FITNESSE}
+
+'''ICA variables'''
+
+!define DS_NAME_ICA_CRIMEALL {ICA_All_Crime_Fitnesse}
+!define CSV_NAME_ICA_CRIMEALL {Crimes_All_Fitnesse.csv}
+!define TT_NAME_ICA_CRIMEALL {ICA_ALL_CRIME_FITNESSE}
+!define DS_NAME_ICA_CRIMETARG {ICA_Targeted_Crime_Fitnesse}
+!define CSV_NAME_ICA_CRIMETARG {Crimes_Targeted_Fitnesse.csv}
+!define TT_NAME_ICA_CRIMETARG {ICA_TARGETED_CRIME_FITNESSE}
+!define DS_NAME_ICA_ZONES {ICA_Zones_Fitnesse}
+!define DB_NAME_ICA_ZONES {IOC.ZONES}
+!define TT_NAME_ICA_ZONES {ICA_ZONES_FITNESSE}
+!define DS_NAME_ICA_WEATHER {ICA_Weather_Fitnesse}
+!define TT_NAME_ICA_WEATHER {ICA_WEATHER_FITNESSE}
+!define DS_NAME_ICA_JUVENILES {ICA_Juveniles_Fitnesse}
+!define DB_NAME_ICA_JUVENILES {IOC.ILP_JUVENILE}
+!define TT_NAME_ICA_JUVENILES {ICA_JUVENILES_FITNESSE}
+!define DS_NAME_ICA_ADULTS {ICA_Adults_Fitnesse}
+!define DB_NAME_ICA_ADULTS {IOC.ILP}
+!define TT_NAME_ICA_ADULTS {ICA_ADULTS_FITNESSE}
+!define DS_NAME_ICA_ADULT_ARRESTS {ICA_Adult_Arrests_Fitnesse}
+!define DB_NAME_ICA_ADULT_ARRESTS {IOC.ARREST_RECORDS}
+!define TT_NAME_ICA_ADULT_ARRESTS {ICA_ADULT_ARRESTS_FITNESSE}
+!define DS_NAME_ICA_JUVENILE_ARRESTS {ICA_Juvenile_Arrests_Fitnesse}
+!define DB_NAME_ICA_JUVENILE_ARRESTS {IOC.JUV_ARREST_RECORDS}
+!define TT_NAME_ICA_JUVENILE_ARRESTS {ICA_JUVENILE_ARRESTS_FITNESSE}
+!define DS_NAME_ICA_DISTRICTS {ICA_Districts_Fitnesse}
+!define DB_NAME_ICA_DISTRICTS {IOC.DISTRICTS}
+!define TT_NAME_ICA_DISTRICTS {ICA_DISTRICTS_FITNESSE}
+!define DS_NAME_ICA_REPAREAS {ICA_Reporting_Areas_Fitnesse}
+!define DB_NAME_ICA_REPAREAS {IOC.AREAS}
+!define TT_NAME_ICA_REPAREAS {ICA_REPORTING_AREAS_FITNESSE}

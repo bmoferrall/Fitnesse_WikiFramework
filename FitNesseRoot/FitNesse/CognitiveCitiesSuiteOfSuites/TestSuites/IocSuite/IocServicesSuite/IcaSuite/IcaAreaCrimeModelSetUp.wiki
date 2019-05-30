@@ -1,0 +1,77 @@
+---
+Help: Create, use and delete ICA Area Crime Model
+Test
+---
+<test page>
+
+!define TEST_SYSTEM {slim}
+!path   ./CognitiveCitiesTesting.jar
+
+'''Include Variable Definitions'''
+
+!include <IocSuite.IocServicesSuite.SetUpVariables
+
+'''Configure Factor'''
+
+| generic service validator fixture |
+| # comment | requestType | serviceName | requestBody | customHeaders | getResponseCode? | getResponseMessage? | getResponseId? | getResponseMap? | getResultCount? | getUrl? |
+| Configure factor | POST | /cros-service/spatialfeature/ | {"datasourceId":$DSID_ICACRIMETARG,"datasourceCol":"TYPE","temporal":"false","frequency":"daily","identifier":"Larceny_Theft_GroupByStreet","condition":"{\"operator\":\"=\",\"values\":[\"Larceny/Theft\"]}","identifierColumn":"STREET"} | | 200 | =~/(?i)"identifier":"Larceny_Theft_GroupByStreet"/ | | $FACTORMAP= | 1 | |
+
+'''Configure and run Area Crime Model'''
+
+| generic service validator fixture |
+| # comment | requestType | serviceName | requestBody | customHeaders | getResponseCode? | getResponseMessage? | getResponseId? | getResultCount? | getUrl? |
+| Query factors | GET | /cros-service/spatialfeature/ | | | 200 | =~/(?i)"identifier":"Larceny_Theft_GroupByStreet"/ | | >=1 | |
+| Query crime types | GET | /cros-service/crimemodel/crimeTypes/ | | | 200 | =~/(?i)"Larceny\/Theft"/ | | >=12 | |
+| Create i18n resource for model name | POST | /i18n-service/resources | {"group": "CROS_INPUT", "locale":"en", "key":"ICACrimeModel_Fitnesse_NAME", "value":"ICA Crime Model Sample (Fitnesse)","messages": []} | | | | | | |
+| Create Crime Model | POST | /cros-service/crimemodel/ | {"name":"{\"group\":\"CROS_INPUT\",\"key\":\"ICACrimeModel_Fitnesse_NAME\"}","description":"Area crime model sample description (Fitnesse)","namedAreaId":"$DSID_ICADISTRICTS","namedAreaDatasourceIdCol":"DISTRICTID","reapply_frequence":"daily","status":"New","timeUnit":1,"schedule_time":"01:00:00","crimeType":"Part_One_Crime","frequence":"{\"frequency\":\"daily\",\"dayOfWeek\":\"0\",\"dayOfMonth\":\"1\"}","excluded_type":["Homicide","Sex Offenses: Forcible"],"targetedDsId":"$DSID_ICACRIMETARG","targetedDsType":"TYPE","allDsId":"$DSID_ICACRIMEALL","isShowLabelsSet":true} | | 200 | =~/(?i)"description":"Area crime model sample description \(Fitnesse\)"/ | $AREACRIMEMODELID= | 1 | |
+| Update catalog | POST | /cros-service/spatialfeature/updateCatalog/ | | | 200 | | | | | |
+
+'''Pause to allow feature catalog to update, then run the model'''
+
+| script |
+| time delay ; | 30000 |
+
+| generic service validator fixture |
+| # comment | requestType | serviceName | requestBody | customHeaders | getResponseCode? | getResponseMessage? | getResponseId? | getResultCount? | getUrl? |
+| Reset timers | POST | /cros-service/crimemodel/resetTimers/ | | | 200 | | | | |
+| Run the model | POST | /cros-service/predictionService/$AREACRIMEMODELID/predict | | | 200 | | | 1 | |
+
+'''Pause to allow the model to execute fully'''
+
+| script |
+| time delay ; | 120000 |
+
+| generic database fixture |
+| # comment | connectionName | statementType | statementText | responseFormat | getResponse? | getResultCount? | getResponseMessage? | getFirstResultField? |
+| Get the id of the new prediction data source | iocdb | read | select id from ioc.datasource_sources where name='ica_crime_pred_$AREACRIMEMODELID' | json | | 1 | OK | $DSID_AREACRIMEMODEL= |
+| Get the object id of district DG3 | iocdata | read | select objectid from ioc.target_table_${TT_NAME_ICA_DISTRICTS} where name='DG3' | json | | 1 | OK | $DISTRICTID= |
+
+'''Capture tomorrow's date to use for prediction'''
+
+| time fixtures |
+| timeMethod | parameterList | getResponseMessage? | getResponse? |
+| CURRENTTIMEPLUSDAYS | 1;yyyy-MM-dd | OK | $TARGETDATE= |
+| CURRENTTIMEPLUSDAYS | 1;yyyy-MM-dd'T'08:00:00 | OK | $PREDICTIONSTART= |
+| CURRENTTIMEPLUSDAYS | 1;yyyy-MM-dd'T'08:59:59 | OK | $PREDICTIONSTARTPLUSHOUR= |
+| CURRENTTIMEPLUSDAYS | 1;yyyy-MM-dd'T'16:00:00 | OK | $PREDICTIONEND= |
+| CURRENTTIMEPLUSDAYS | 1;yyyy-MM-dd'T'00:00:00'%2B'0000 | OK | $PSTARTOFDAY= |
+| CURRENTTIMEPLUSDAYS | 1;yyyy-MM-dd'T'23:59:00'%2B'0000 | OK | $PENDOFDAY= |
+
+'''Switch to ICA Operations page'''
+
+| generic service validator fixture |
+| # comment | requestType | serviceName | requestBody | customHeaders | getResponseCode? | getResponseMessage? | getResponseId? | getResultCount? | getUrl? |
+| Query crime models | GET | /cros-service/crimemodel | | | 200 | =~/(?i)"description":"Area crime model sample description \(Fitnesse\)"/ | | >=1 | |
+| Get prediction data by time range | GET | /cros-service/prediction/byDateTimeRange?predictionStartTime=$PREDICTIONSTART&predictionEndTime=$PREDICTIONEND&modelId=$AREACRIMEMODELID | | | 200 | =~/(?i)"predictionDate":"$TARGETDATE"/ | | 1 | |
+| Get prediction data by type | GET | /cros-service/prediction/byType?predictionTime=$TARGETDATE%2008:00:00&modelId=$AREACRIMEMODELID&areaIds=$DISTRICTID | | | 200 | =~/(?i)"text":"Larceny\/Theft"/ | | 1 | |
+| Query factors for the selected date | GET | /cros-service/crimemodel/$AREACRIMEMODELID/factors?targetDate=$TARGETDATE | | | 200 | =~/(?i)"name":"Larceny_Theft_GroupByStreet-NW 14TH ST_VALUE_Sum","rank":[0-9]+,"iValue":[0-9\.]+/ | | 1 | |
+| Query features for new datasource | GET | /cros-service/predictionService/features/$DSID_AREACRIMEMODEL/?criterion=startDateTime%3E%3D$PREDICTIONSTART&criterion=startDateTime%3C$PREDICTIONSTARTPLUSHOUR&criterion=deleteflag%3D0 | | | 200 | =~/(?i)"PROBABILITY":[\.0-9]+/ | | 1 | |
+| Crime axis data | GET | /cros-service/crimeAxisData/barChart?id=$DSID_ICACRIMETARG&startDate=$PSTARTOFDAY&endDate=$PENDOFDAY&groupBy=STARTDAYOFWEEK&excludedColumn=ica_none | | | 200 | =~/(?i)"data":.*?"axis"/ | | 1 | |
+
+'''Run some data verifications'''
+
+| generic database fixture |
+| connectionName | statementType | statementText | responseFormat | getResponse? | getResultCount? | getResponseMessage? | getFirstResultField? |
+| iocdata | read | select count(objectid) as ocnt from cast.prediction_results_$AREACRIMEMODELID | json | | 1 | OK | >1000 |
+| iocdata | read | select count(cat_objectid) as ocnt from cast.staticfeatures where cat_objectid=$`FACTORMAP.objectId` | json | | 1 | OK | >1000 |

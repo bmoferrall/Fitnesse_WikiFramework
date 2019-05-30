@@ -1,0 +1,21 @@
+---
+Help: Delete staging tables
+Test
+---
+<test page>
+
+!define TEST_SYSTEM {slim}
+!path   ./CognitiveCitiesTesting.jar
+
+'''Include Variable Definitions'''
+
+!include <IocSuite.IocServicesSuite.SetUpVariables
+
+| script |
+| database delete; | iocdata | drop table ${DB_NAME_ICA_ADULTS} |
+| database delete; | iocdata | drop table ${DB_NAME_ICA_JUVENILES} |
+| database delete; | iocdata | drop table ${DB_NAME_ICA_ADULT_ARRESTS} |
+| database delete; | iocdata | drop table ${DB_NAME_ICA_JUVENILE_ARRESTS} |
+| database delete; | iocdata | drop table ${DB_NAME_ICA_DISTRICTS} |
+| database delete; | iocdata | drop table ${DB_NAME_ICA_REPAREAS} |
+| database delete; | iocdata | drop table ${DB_NAME_ICA_ZONES} |

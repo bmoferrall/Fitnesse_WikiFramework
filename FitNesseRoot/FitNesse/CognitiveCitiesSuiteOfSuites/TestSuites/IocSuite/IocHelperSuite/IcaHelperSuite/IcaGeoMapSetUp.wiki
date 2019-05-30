@@ -1,0 +1,15 @@
+---
+Help: Configure the map for ICA
+Test
+---
+<test page>
+
+!define TEST_SYSTEM {slim}
+!path   ./CognitiveCitiesTesting.jar
+
+'''CREATE MAP SETTINGS FOR ICA'''
+
+| generic service validator fixture |
+| requestType | serviceName | requestBody | customHeaders | getResponseCode? | getResponseMessage? | getResponseId? | getResultCount? | getUrl? |
+| POST | /mapsettings-service/mapdefinitions | !-{ "messages":null, "group":"CustomMapSettings_ICA_Fitnesse", "namespace":null, "mapType":"XYZ", "googleMapType":null, "url":"http://services.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/${z}/${y}/${x}", "defaultMap":false, "attribution":"", "lon":"-80.11615839771684", "lat":"26.11190068285595", "defaultZoom":13, "esriDefinition":null, "alternateDefinition":null, "zoomLevels":18, "defaultForGroups":[ ], "authorizations":[ "SolutionAdmins", "SystemAdmins" ], "name":{ "group":"Test", "key":"ICAGeoMapLabel", "i18nLabel":"ICA Map (Fitnesse)", "resources":[ { "group":"Test", "locale":"en", "key":"ICAGeoMapLabel", "value":"ICA Map (Fitnesse)" } ] } } -! | | 200 | | $ICA_MAPSETTINGSID= | | |
+| GET | /mapsettings-service/mapdefinitions/$ICA_MAPSETTINGSID | | | 200 | =~/(?i)"i18nLabel":"ICA Map \(Fitnesse\)"/ | | 1 | |
