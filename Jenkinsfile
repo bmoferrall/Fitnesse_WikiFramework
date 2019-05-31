@@ -42,14 +42,14 @@ pipeline {
 			from: 'admin@jenkins.com',
 			to: 'mooreof@ie.ibm.com',
 			subject: "Fitnesse suite complete (success): ${currentBuild.fullDisplayName}",
-			body: "Successful test execution. Check attached file for results "
+			body: "Successful test execution. Check attached file for results\nOutput Format: ${params.OUTPUTFORMAT}\nEnvironment: ${params.PROPERTYFILE}"
 		}
 		failure {
 			emailext attachmentsPattern: "TestSuite_Results.${params.OUTPUTFORMAT}",
 			from: 'admin@jenkins.com',
 			to: 'mooreof@ie.ibm.com',
 			subject: "Fitnesse suite complete (fail): ${currentBuild.fullDisplayName}",
-			body: "Test execution failed. Check attached file for results "
+			body: "Test execution failed. Check attached file for results\nOutput Format: ${params.OUTPUTFORMAT}\nEnvironment: ${params.PROPERTYFILE}"
 		}
 	}
 }
