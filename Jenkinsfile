@@ -17,7 +17,7 @@ pipeline {
 			steps {
 				echo "Web Server: ${params.WEBSERVER}"
 				sh 'chmod +x configure_env.sh'
-				sh './configure_env.sh ${params.WEBSERVER}'
+				sh "./configure_env.sh ${params.WEBSERVER}"
 			}
 		}
 		stage('Run IOC Suite') {
