@@ -2,7 +2,7 @@ pipeline {
 	agent any
 	parameters {
 		choice(name: "PROPERTYFILE", choices: ['dubperfwow2.properties', 'amir_profile3.properties'], description: "Choose a property file to use")
-		choice(name: 'OUTPUTFORMAT', choices: ['xml', 'html'], description: 'Select output format')
+		choice(name: 'OUTPUTFORMAT', choices: ['html', 'xml'], description: 'Select output format')
 	}
 	stages {
 		stage('Configure Environment') {
