@@ -33,14 +33,14 @@ pipeline {
 			from: 'admin@jenkins.com',
 			to: 'mooreof@ie.ibm.com',
 			subject: "Fitnesse suite complete (success): ${currentBuild.fullDisplayName}",
-			body: "Successful test execution.\nEnvironment: ${params.PROPERTYFILE}\nCheck attached file(s) for results\n\n"
+			body: "Successful test execution.\nEnvironment: ${params.PROPERTYFILE}\nCheck attached file(s) for results\n...\n "
 		}
 		failure {
 			emailext attachmentsPattern: "IocSuite_Results.xml, IocSuite_Results_junit.xml",
 			from: 'admin@jenkins.com',
 			to: 'mooreof@ie.ibm.com',
 			subject: "Fitnesse suite complete (fail): ${currentBuild.fullDisplayName}",
-			body: "Test execution failed.\nEnvironment: ${params.PROPERTYFILE}\nCheck attached file(s) for results\n\n"
+			body: "Test execution failed.\nEnvironment: ${params.PROPERTYFILE}\nCheck attached file(s) for results\n...\n "
 		}
 	}
 }
