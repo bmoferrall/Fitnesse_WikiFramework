@@ -18,9 +18,9 @@ pipeline {
 			steps {
 				script {
 					if (params.OUTPUTFORMAT == 'html') {
-						sh 'java -jar fitnesse-standalone.jar -d "./" -p 9090 -o -b TestSuite_Results.html -c "FitNesse.CognitiveCitiesSuiteOfSuites.TestSuites.IocSuite.IocServicesSuite.MiscellaneousIocServices?suite&format=html"'
+						sh 'java -jar fitnesse-standalone.jar -d "./" -p 9090 -o -b TestSuite_Results.html -c "FitNesse.CognitiveCitiesSuiteOfSuites.TestSuites.IocSuite.IocServicesSuite.SopServicesSuite?suite&format=html"'
 					} else {
-						sh 'java -jar fitnesse-standalone.jar -d "./" -p 9090 -o -b TestSuite_Results.xml -c "FitNesse.CognitiveCitiesSuiteOfSuites.TestSuites.IocSuite.IocServicesSuite.MiscellaneousIocServices?suite&format=junit"'
+						sh 'java -jar fitnesse-standalone.jar -d "./" -p 9090 -o -b TestSuite_Results.xml -c "FitNesse.CognitiveCitiesSuiteOfSuites.TestSuites.IocSuite.IocServicesSuite.SopServicesSuite?suite&format=junit"'
 					}
 				}
 			}
