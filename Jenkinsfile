@@ -15,7 +15,7 @@ pipeline {
 	stages {
 		stage('Configure Environment') {
 			steps {
-				sh 'printenv'
+				echo "Web Server: ${params.WEBSERVER}"
 			}
 		}
 		stage('Run IOC Suite') {
