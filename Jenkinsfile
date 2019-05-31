@@ -2,7 +2,6 @@ pipeline {
 	agent any
 	parameters {
 		choice(name: "PROPERTYFILE", choices: ['dubperfwow2.properties', 'amir_profile3.properties'], description: "Choose a property file to use")
-		choice(name: 'OUTPUTFORMAT', choices: ['html', 'xml'], description: 'Select output format')
 	}
 	stages {
 		stage('Configure Environment') {
@@ -16,41 +15,32 @@ pipeline {
 				timeout(time: 1, unit: 'HOURS')
 			}
 			steps {
-				script {
-					if (params.OUTPUTFORMAT == 'html') {
-						sh 'java -jar fitnesse-standalone.jar -d "./" -p 9090 -o -b TestSuite_Results.html -c "FitNesse.CognitiveCitiesSuiteOfSuites.TestSuites.IocSuite.IocServicesSuite.SopServicesSuite?suite&format=html"'
-					} else {
-						sh 'java -jar fitnesse-standalone.jar -d "./" -p 9090 -o -b TestSuite_Results.xml -c "FitNesse.CognitiveCitiesSuiteOfSuites.TestSuites.IocSuite.IocServicesSuite.SopServicesSuite?suite&format=junit"'
-					}
-				}
+				sh 'java -jar fitnesse-standalone.jar -d "./" -p 9090 -o -b IocSuite_Results.xml -c "FitNesse.CognitiveCitiesSuiteOfSuites.TestSuites.IocSuite.IocServicesSuite.SopServicesSuite?suite&format=xml"'
+				sh 'xmlto -x /var/lib/jenkins/workspace/lib/xsl_fitnesse.xsl html IocSuite_Results.xml --skip-validation'
+				sh 'mv IocSuite_Results.proc IocSuite_Results_junit.xml'
 			}
 		}
-		stage('Archive Results') {
+		stage('Process Results') {
 			steps {
-				script {
-					print "Format: " + params.OUTPUTFORMAT
-					if (params.OUTPUTFORMAT == 'xml') {
-						junit 'TestSuite_Results.xml'
-					}
-					archiveArtifacts "TestSuite_Results.${params.OUTPUTFORMAT}"
-				}
+				junit 'IocSuite_Results_junit.xml'
+				archiveArtifacts "IocSuite_Results.xml IocSuite_Results_junit.xml"
 			}
 		}
 	}
 	post {
 		success {
-			emailext attachmentsPattern: "TestSuite_Results.${params.OUTPUTFORMAT}",
+			emailext attachmentsPattern: "IocSuite_Results.xml IocSuite_Results_junit.xml",
 			from: 'admin@jenkins.com',
 			to: 'mooreof@ie.ibm.com',
 			subject: "Fitnesse suite complete (success): ${currentBuild.fullDisplayName}",
-			body: "Successful test execution. Check attached file for results\nOutput Format: ${params.OUTPUTFORMAT}\nEnvironment: ${params.PROPERTYFILE}"
+			body: "Successful test execution. Check attached file for results\nEnvironment: ${params.PROPERTYFILE}"
 		}
 		failure {
-			emailext attachmentsPattern: "TestSuite_Results.${params.OUTPUTFORMAT}",
+			emailext attachmentsPattern: "IocSuite_Results.xml IocSuite_Results_junit.xml",
 			from: 'admin@jenkins.com',
 			to: 'mooreof@ie.ibm.com',
 			subject: "Fitnesse suite complete (fail): ${currentBuild.fullDisplayName}",
-			body: "Test execution failed. Check attached file for results\nOutput Format: ${params.OUTPUTFORMAT}\nEnvironment: ${params.PROPERTYFILE}"
+			body: "Test execution failed. Check attached file for results\nEnvironment: ${params.PROPERTYFILE}"
 		}
 	}
 }
