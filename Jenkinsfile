@@ -15,9 +15,16 @@ pipeline {
 	stages {
 		stage('Configure Environment') {
 			steps {
-				echo "Web Server: ${params.WEBSERVER}"
-				sh 'chmod +x configure_env.sh'
-				sh "./configure_env.sh ${params}"
+				sh "/var/lib/jenkins/workspace/lib/configure_fitnesse_ioc.sh WEBSERVER ${params.WEBSERVER}"
+				sh "/var/lib/jenkins/workspace/lib/configure_fitnesse_ioc.sh ANASERVER ${params.ANASERVER}"
+				sh "/var/lib/jenkins/workspace/lib/configure_fitnesse_ioc.sh APPSERVER ${params.APPSERVER}"
+				sh "/var/lib/jenkins/workspace/lib/configure_fitnesse_ioc.sh DBSERVER ${params.DBSERVER}"
+				sh "/var/lib/jenkins/workspace/lib/configure_fitnesse_ioc.sh WEBPORT ${params.WEBPORT}"
+				sh "/var/lib/jenkins/workspace/libconfigure_fitnesse_ioc.sh DBPORT ${params.DBBPORT}"
+				sh "/var/lib/jenkins/workspace/lib/configure_fitnesse_ioc.sh IOCUSER ${params.IOCUSER}"
+				sh "/var/lib/jenkins/workspace/lib/configure_fitnesse_ioc.sh IOCPASSWORD ${params.IOCPASSWORD}"
+				sh "/var/lib/jenkins/workspace/lib/configure_fitnesse_ioc.sh DBUSER ${params.DBUSER}"
+				sh "/var/lib/jenkins/workspace/lib/configure_fitnesse_ioc.sh DBPASSWORD ${params.DBPASSWORD}"
 			}
 		}
 		stage('Run IOC Suite') {
