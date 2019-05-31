@@ -1,2 +1,2 @@
 params=$1
-echo "Parameters: ${params}"
+echo "Parameters: ${params.WEBSERVER}"
