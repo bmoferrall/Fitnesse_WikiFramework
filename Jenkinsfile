@@ -28,6 +28,7 @@ pipeline {
 		stage('Archive Results') {
 			steps {
 				script {
+					print "Format: " + params.OUTPUTFORMAT
 					if (params.OUTPUTFORMAT == 'xml') {
 						junit 'TestSuite_Results.xml'
 					}
