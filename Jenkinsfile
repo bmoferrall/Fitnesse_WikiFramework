@@ -35,21 +35,21 @@ pipeline {
 				}
 			}
 		}
-		post {
-			success {
-				emailext attachmentsPattern: "TestSuite_Results.${params.OUTPUTFORMAT}",
-				from: 'admin@jenkins.com',
-				to: 'mooreof@ie.ibm.com',
-				subject: "Fitnesse suite complete (success): ${currentBuild.fullDisplayName}",
-				body: "Successful test execution. Check attached file for results "
-			}
-			failure {
-				emailext attachmentsPattern: "TestSuite_Results.${params.OUTPUTFORMAT}",
-				from: 'admin@jenkins.com',
-				to: 'mooreof@ie.ibm.com',
-				subject: "Fitnesse suite complete (fail): ${currentBuild.fullDisplayName}",
-				body: "Test execution failed. Check attached file for results "
-			}
+	}
+	post {
+		success {
+			emailext attachmentsPattern: "TestSuite_Results.${params.OUTPUTFORMAT}",
+			from: 'admin@jenkins.com',
+			to: 'mooreof@ie.ibm.com',
+			subject: "Fitnesse suite complete (success): ${currentBuild.fullDisplayName}",
+			body: "Successful test execution. Check attached file for results "
+		}
+		failure {
+			emailext attachmentsPattern: "TestSuite_Results.${params.OUTPUTFORMAT}",
+			from: 'admin@jenkins.com',
+			to: 'mooreof@ie.ibm.com',
+			subject: "Fitnesse suite complete (fail): ${currentBuild.fullDisplayName}",
+			body: "Test execution failed. Check attached file for results "
 		}
 	}
 }
