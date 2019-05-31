@@ -20,7 +20,7 @@ pipeline {
 				sh "/var/lib/jenkins/workspace/lib/configure_fitnesse_ioc.sh APPSERVER ${params.APPSERVER}"
 				sh "/var/lib/jenkins/workspace/lib/configure_fitnesse_ioc.sh DBSERVER ${params.DBSERVER}"
 				sh "/var/lib/jenkins/workspace/lib/configure_fitnesse_ioc.sh WEBPORT ${params.WEBPORT}"
-				sh "/var/lib/jenkins/workspace/libconfigure_fitnesse_ioc.sh DBPORT ${params.DBPORT}"
+				sh "/var/lib/jenkins/workspace/lib/configure_fitnesse_ioc.sh DBPORT ${params.DBPORT}"
 				sh "/var/lib/jenkins/workspace/lib/configure_fitnesse_ioc.sh IOCUSER ${params.IOCUSER}"
 				sh "/var/lib/jenkins/workspace/lib/configure_fitnesse_ioc.sh IOCPASSWORD ${params.IOCPASSWORD}"
 				sh "/var/lib/jenkins/workspace/lib/configure_fitnesse_ioc.sh DBUSER ${params.DBUSER}"
