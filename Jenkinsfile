@@ -15,7 +15,7 @@ pipeline {
 				timeout(time: 1, unit: 'HOURS')
 			}
 			steps {
-				sh 'java -jar fitnesse-standalone.jar -d "./" -p 9090 -o -b IocSuite_Results.xml -c "FitNesse.CognitiveCitiesSuiteOfSuites.TestSuites.IocSuite.IocServicesSuite.SopServicesSuite?suite&format=xml"'
+				sh 'java -jar fitnesse-standalone.jar -d "./" -p 9090 -o -b IocSuite_Results.xml -c "FitNesse.CognitiveCitiesSuiteOfSuites.TestSuites.IocSuite.IocServicesSuite.MiscellaneousIocServices?suite&format=xml"'
 				sh 'xmlto -x /var/lib/jenkins/workspace/lib/xsl_fitnesse.xsl html IocSuite_Results.xml --skip-validation'
 				sh 'mv IocSuite_Results.proc IocSuite_Results_junit.xml'
 			}
@@ -33,14 +33,14 @@ pipeline {
 			from: 'admin@jenkins.com',
 			to: 'mooreof@ie.ibm.com',
 			subject: "Fitnesse suite complete (success): ${currentBuild.fullDisplayName}",
-			body: "Successful test execution. Check attached file for results\nEnvironment: ${params.PROPERTYFILE}"
+			body: "Successful test execution.\nEnvironment: ${params.PROPERTYFILE}\nCheck attached file(s) for results "
 		}
 		failure {
 			emailext attachmentsPattern: "IocSuite_Results.xml, IocSuite_Results_junit.xml",
 			from: 'admin@jenkins.com',
 			to: 'mooreof@ie.ibm.com',
 			subject: "Fitnesse suite complete (fail): ${currentBuild.fullDisplayName}",
-			body: "Test execution failed. Check attached file for results\nEnvironment: ${params.PROPERTYFILE}"
+			body: "Test execution failed.\nEnvironment: ${params.PROPERTYFILE}\nCheck attached file(s) for results "
 		}
 	}
 }
