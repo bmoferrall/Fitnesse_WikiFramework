@@ -1,18 +1,13 @@
 pipeline {
 	agent any
 	parameters {
-		file(name: "PROPERTYFILE", description: "Choose a property file to use")
+		choice(name: "PROPERTYFILE", choices: ['dubperfwow2.properties', 'amir_profile3.properties'], description: "Choose a property file to use")
 		choice(name: 'OUTPUTFORMAT', choices: ['xml', 'html'], description: 'Select output format')
 	}
 	stages {
 		stage('Configure Environment') {
 			steps {
-				script {
-					if (params.PROPERTYFILE == null) {
-						params.PROPERTYFILE = '/var/lib/jenkins/workspace/properties/dubperfwow2.properties'
-					}
-					sh "/var/lib/jenkins/workspace/lib/configure_fitnesse_ioc.sh ${params.PROPERTYFILE}"
-				}
+				sh "/var/lib/jenkins/workspace/lib/configure_fitnesse_ioc.sh ${params.PROPERTYFILE}"
 			}
 		}
 		stage('Run IOC Suite') {
