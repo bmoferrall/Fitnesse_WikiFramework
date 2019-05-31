@@ -23,20 +23,20 @@ pipeline {
 		stage('Process Results') {
 			steps {
 				junit 'IocSuite_Results_junit.xml'
-				archiveArtifacts "IocSuite_Results.xml IocSuite_Results_junit.xml"
+				archiveArtifacts "IocSuite_Results.xml, IocSuite_Results_junit.xml"
 			}
 		}
 	}
 	post {
 		success {
-			emailext attachmentsPattern: "IocSuite_Results.xml IocSuite_Results_junit.xml",
+			emailext attachmentsPattern: "IocSuite_Results.xml, IocSuite_Results_junit.xml",
 			from: 'admin@jenkins.com',
 			to: 'mooreof@ie.ibm.com',
 			subject: "Fitnesse suite complete (success): ${currentBuild.fullDisplayName}",
 			body: "Successful test execution. Check attached file for results\nEnvironment: ${params.PROPERTYFILE}"
 		}
 		failure {
-			emailext attachmentsPattern: "IocSuite_Results.xml IocSuite_Results_junit.xml",
+			emailext attachmentsPattern: "IocSuite_Results.xml, IocSuite_Results_junit.xml",
 			from: 'admin@jenkins.com',
 			to: 'mooreof@ie.ibm.com',
 			subject: "Fitnesse suite complete (fail): ${currentBuild.fullDisplayName}",
