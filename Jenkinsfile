@@ -20,7 +20,7 @@ pipeline {
     post {
         always {
 		emailext attachmentsPattern: 'TestSuite_Results.xml',
-	        mail to: 'mooreof@ie.ibm.com',
+	        to: 'mooreof@ie.ibm.com',
                 subject: "Fitnesse suite complete: ${currentBuild.fullDisplayName}",
                 body: "Check attached file for results"
         }
